@@ -1,0 +1,7 @@
+{
+  "main": "src/index",
+  "dependencies": {
+    "adm-zip": "^0.5.9",
+    "figlet": "^1.5.2"
+  }
+}
