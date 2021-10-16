@@ -22,7 +22,7 @@ if (!fs.existsSync(input)) return console.log("Input '" + input + "' not found")
 const update = output => {
   console.clear();
   console.log(title);
-  if (output) console.log(output);
+  if (output) console.log("\n" + output + "\n");
 };
 
 const end = error => {
