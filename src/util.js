@@ -6,6 +6,11 @@ const { parseFile } = require("@fast-csv/parse");
 const isDir = path => fs.lstatSync(path).isDirectory();
 const hasFiles = (folder, files) => files.every(file => fs.existsSync(resolve(folder, file)));
 
+const parseEmoji = emoji => {
+  const [_, name, id] = emoji.slice(1, -1).split(":");
+  return ":" + name + ":";
+};
+
 const sortFrequency = elements => {
   const frequency = {};
   const unique = [];
@@ -15,46 +20,46 @@ const sortFrequency = elements => {
     if (frequency[element] && typeof frequency[element] !== "number") continue;
     if (!frequency[element]) {
       frequency[element] = 0;
-      unique.push(element);
+      unique.push(_element);
     }
 
     frequency[element]++;
   }
 
   return unique
-    .map(element => ({ element, count: frequency[element] }))
+    .map(element => ({ element, count: frequency[element.toLowerCase()] }))
     .sort((a, b) => b.count - a.count);
 };
 
-const format = object =>
-  Object.entries(object)
-    .map(([_header, _values]) => {
-      const entries = Object.entries(_values);
-      if (!entries.length) return "";
+const format = (input, indent = 0, prefix = "") => {
+  let output = "";
 
-      const header = chalk.bold(
-        _header
-          .split("_")
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ")
-      );
+  if (Array.isArray(input))
+    output += input.map(_input => format(_input, indent, "| ")).join("\n") + "\n";
+  else if (typeof input === "object") {
+    const entries = Object.entries(input);
+    if (entries.length)
+      output += entries
+        .map(([key, value]) => {
+          if (Array.isArray(value) || typeof value === "object")
+            value = "\n" + format(value, indent + 2);
+          else if (typeof value === "number") value = value.toLocaleString();
+          return format(chalk.bold(proper(key)), indent) + ": " + value;
+        })
+        .join("\n");
 
-      const list = entries.map(([key, value]) => {
-        key = key
-          .split("_")
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
+    if (!output.endsWith("\n")) output += "\n";
+  } else output += " ".repeat(indent) + prefix + input;
 
-        if (Array.isArray(value))
-          value = "\n" + value.map(_value => "   | " + _value).join("\n") + "\n";
+  return output;
+};
 
-        return " - " + key + ": " + value;
-      });
+const proper = input => {
+  if (Array.isArray(input))
+    return input.map(text => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()).join(" ");
 
-      return header + ":\n" + list.join("\n") + "\n\n";
-    })
-    .join("")
-    .trim();
+  return proper(input.split(/[^a-zA-Z0-9]+/));
+};
 
 const read = path => {
   if (path.endsWith(".csv"))
@@ -79,7 +84,9 @@ const read = path => {
 module.exports = {
   isDir,
   hasFiles,
+  parseEmoji,
   sortFrequency,
   format,
+  proper,
   read
 };

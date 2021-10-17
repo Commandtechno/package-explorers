@@ -1,27 +1,15 @@
 const { hasFiles, format } = require("../../util");
 
 const account = require("./account");
-const activity = require("./activity");
 const messages = require("./messages");
-const programs = require("./programs");
 const servers = require("./servers");
 
 module.exports = async function (folder, update, end) {
-  const times = {
-    account: {},
-    activity: {},
-    messages: {},
-    programs: {},
-    servers: {}
-  };
-
   const result = {
     times: {},
 
     account: {},
-    activity: {},
     messages: {},
-    programs: {},
     servers: {}
   };
 
@@ -37,13 +25,13 @@ module.exports = async function (folder, update, end) {
   update(format(result));
 
   start = Date.now();
-  await activity(folder, result);
-  result.times.activity = (Date.now() - start).toFixed(1) + "ms";
+  await messages(folder, result);
+  result.times.messages = (Date.now() - start).toFixed(1) + "ms";
   update(format(result));
 
   start = Date.now();
-  await messages(folder, result);
-  result.times.messages = (Date.now() - start).toFixed(1) + "ms";
+  await servers(folder, result);
+  result.times.servers = (Date.now() - start).toFixed(1) + "ms";
   update(format(result));
 
   end();

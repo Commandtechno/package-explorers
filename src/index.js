@@ -2,6 +2,7 @@ let [service, input] = process.argv.slice(2);
 
 const fs = require("fs");
 const path = require("path");
+const unzip = require("extract-zip");
 const figlet = require("figlet");
 
 const tempDir = path.resolve(__dirname, "temp");
@@ -22,7 +23,7 @@ if (!fs.existsSync(input)) return console.log("Input '" + input + "' not found")
 const update = output => {
   console.clear();
   console.log(title);
-  if (output) console.log("\n" + output + "\n");
+  if (output) console.log(output);
 };
 
 const end = error => {
@@ -35,23 +36,22 @@ update();
 
 const servicePath = path.resolve(servicesDir, service);
 const callback = require(servicePath);
-
-if (input.endsWith(".zip")) {
-  const Zip = require("adm-zip");
-  const zip = new Zip(input);
-  input = path.resolve(input, tempDir, Date.now().toString(36));
-
-  update("Unzipping...");
-  zip.extractAllTo(input);
-}
-
-if (fs.lstatSync(input).isDirectory()) {
-  let files = fs.readdirSync(input);
-  while (files.length === 1) {
-    const [file] = files;
-    input = path.resolve(input, file);
-    files = fs.readdirSync(input);
+(async () => {
+  if (input.endsWith(".zip")) {
+    update("Unzipping...");
+    await unzip(input, { tempDir });
+    input = tempDir;
   }
-}
 
-callback(input, update, end);
+  if (fs.lstatSync(input).isDirectory()) {
+    let files = fs.readdirSync(input);
+    while (files.length === 1) {
+      const [file] = files;
+      input = path.resolve(input, file);
+      if (!fs.lstatSync(input).isDirectory()) break;
+      files = fs.readdirSync(input);
+    }
+  }
+
+  callback(input, update, end);
+})();

@@ -1,34 +1,8 @@
-const { isDir, sortFrequency, read } = require("../../util");
+const { isDir, sortFrequency, read, parseEmoji } = require("../../util");
 const { readdirSync } = require("fs");
 const { resolve } = require("path");
 
-const excluded = new Set([
-  "you",
-  "the",
-  "to",
-  "it",
-  "and",
-  "is",
-  "that",
-  "for",
-  "in",
-  "do",
-  "have",
-  "so",
-  "what",
-  "but",
-  "not",
-  "we",
-  "of",
-  "was",
-  "are",
-  "im",
-  "like",
-  "if",
-  "he",
-  "with",
-  "has"
-]);
+const { excluded, hours, months, years } = require("./constants");
 
 module.exports = async (folder, result) => {
   const channelsPath = resolve(folder, "messages");
@@ -41,6 +15,10 @@ module.exports = async (folder, result) => {
   const totalServers = [];
   const totalChannels = [];
   const totalWords = [];
+
+  const perHour = Object.fromEntries(hours.map(hour => [hour, 0]));
+  const perMonth = Object.fromEntries(months.map(month => [month, 0]));
+  const perYear = Object.fromEntries(years.map(year => [year, 0]));
 
   let totalMessages = 0;
   let totalAttachments = 0;
@@ -58,12 +36,21 @@ module.exports = async (folder, result) => {
       for (const message of messages) {
         totalMessages++;
 
-        if (message.attachments) totalAttachments++;
-        if (channel.guild) totalServers.push(channel.guild.id);
-        totalChannels.push(channel.id);
-
         message._date = new Date(message.timestamp);
         message._timestamp = message._date.getTime();
+
+        perHour[hours[message._date.getHours()]]++;
+        perMonth[months[message._date.getMonth()]]++;
+        perYear[message._date.getFullYear()]++;
+
+        if (message.attachments) totalAttachments++;
+        if (channel.guild) totalServers.push(channel.guild.name + " (" + channel.guild.id + ")");
+
+        let channelName;
+        if (channel.name) channelName = "#" + channel.name;
+        else channelName = channelsIndex[channel.id];
+        if (channelName) totalChannels.push(channelName + " (" + channel.id + ")");
+
         if (!firstMessage || firstMessage._timestamp > message._timestamp) {
           message._channel = channel;
           firstMessage = message;
@@ -91,54 +78,57 @@ module.exports = async (folder, result) => {
   result.messages.total = totalMessages;
   result.messages.total_attachments = totalAttachments;
   if (firstMessage) {
-    result.messages.first = [
-      '"' + firstMessage.contents + '"',
-      "Date: " + firstMessage._date.toLocaleString()
-    ];
+    result.messages.first = {};
+    result.messages.first.text = '"' + firstMessage.contents + '"';
+    result.messages.first.date = firstMessage._date.toLocaleString();
 
     if (firstMessage._channel.name)
-      result.messages.first.push("Channel: #" + firstMessage._channel.name);
+      result.messages.first.channel = "#" + firstMessage._channel.name;
 
     if (firstMessage._channel.recipients?.length)
-      result.messages.first.push("Users: " + firstMessage._channel.recipients.join(", "));
+      result.messages.first.users = firstMessage._channel.recipients.join(", ");
 
     if (channelsIndex[firstMessage._channel.id])
-      result.messages.first.push("Name: " + channelsIndex[firstMessage._channel.id]);
+      result.messages.first.name = channelsIndex[firstMessage._channel.id];
 
     if (firstMessage._channel.guild?.name)
-      result.messages.first.push("Server: " + irstMessage._channel.guild?.name);
+      result.messages.first.server = firstMessage._channel.guild?.name;
 
-    result.messages.first.push(
+    result.messages.first.url =
       "https://discord.com/channels/" +
-        (firstMessage._channel.guild?.id ?? "@me") +
-        "/" +
-        firstMessage._channel.id +
-        "/" +
-        firstMessage.id
-    );
+      (firstMessage._channel.guild?.id ?? "@me") +
+      "/" +
+      firstMessage._channel.id +
+      "/" +
+      firstMessage.id;
   }
+
+  // Per
+  result.messages.per_hour = perHour;
+  result.messages.per_month = perMonth;
+  result.messages.per_year = perYear;
 
   // Emojis
   result.messages.total_emojis = totalEmojis.length;
   result.messages.favorite_emojis = sortFrequency(totalEmojis)
     .slice(0, 10)
-    .map(({ element, count }) => element.split(":")[1] + " (" + count + ")");
+    .map(({ element, count }) => parseEmoji(element) + " (" + count.toLocaleString() + ")");
 
   // Servers
   result.messages.total_servers = totalServers.length;
   result.messages.favorite_servers = sortFrequency(totalServers)
     .slice(0, 10)
-    .map(({ element, count }) => element + " (" + count + ")");
+    .map(({ element, count }) => element + " (" + count.toLocaleString() + ")");
 
   // Channels
   result.messages.total_channels = channels.length;
   result.messages.favorite_channels = sortFrequency(totalChannels)
     .slice(0, 10)
-    .map(({ element, count }) => element + " (" + count + ")");
+    .map(({ element, count }) => element + " (" + count.toLocaleString() + ")");
 
   // Words
   result.messages.total_words = totalWords.length;
   result.messages.favorite_words = sortFrequency(totalWords)
     .slice(0, 10)
-    .map(({ element, count }) => element + " (" + count + ")");
+    .map(({ element, count }) => element + " (" + count.toLocaleString() + ")");
 };
