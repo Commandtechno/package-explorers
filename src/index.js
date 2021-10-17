@@ -39,7 +39,7 @@ const callback = require(servicePath);
 (async () => {
   if (input.endsWith(".zip")) {
     update("Unzipping...");
-    await unzip(input, { tempDir });
+    await unzip(input, { dir: tempDir });
     input = tempDir;
   }
 
