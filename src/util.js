@@ -1,10 +1,20 @@
 const fs = require("fs");
 const chalk = require("chalk");
 const { resolve } = require("path");
+const { excluded } = require("./constants");
 const { parseFile } = require("@fast-csv/parse");
 
 const isDir = path => fs.lstatSync(path).isDirectory();
 const hasFiles = (folder, files) => files.every(file => fs.existsSync(resolve(folder, file)));
+const getWords = string => {
+  const words = string.match(/\w+/g);
+  if (!words) return [];
+  return words.filter(word => {
+    if (word.length < 2) return;
+    if (excluded.has(word.toLowerCase())) return;
+    return true;
+  });
+};
 
 const parseEmoji = emoji => {
   const [_, name, id] = emoji.slice(1, -1).split(":");
@@ -84,6 +94,7 @@ const read = path => {
 module.exports = {
   isDir,
   hasFiles,
+  getWords,
   parseEmoji,
   sortFrequency,
   format,

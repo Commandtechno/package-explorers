@@ -1,10 +1,10 @@
-const { isDir, sortFrequency, read, parseEmoji } = require("../../util");
+const { isDir, sortFrequency, read, parseEmoji, getWords } = require("../../util");
 const { readdirSync } = require("fs");
 const { resolve } = require("path");
 
-const { excluded, hours, months, years } = require("./constants");
+const { hours, months, years } = require("../../constants");
 
-module.exports = async (folder, result) => {
+module.exports = async function (folder, result) {
   const channelsPath = resolve(folder, "messages");
   const channels = readdirSync(channelsPath);
 
@@ -61,15 +61,7 @@ module.exports = async (folder, result) => {
           totalEmojis.push(...emojis);
         }
 
-        const words = message.contents.match(/\w+/g);
-        if (words)
-          totalWords.push(
-            ...words.filter(word => {
-              if (word.length < 3) return;
-              if (excluded.has(word.toLowerCase())) return;
-              return true;
-            })
-          );
+        totalWords.push(...getWords(message.contents));
       }
     }
   }
@@ -106,7 +98,9 @@ module.exports = async (folder, result) => {
   // Per
   result.messages.per_hour = perHour;
   result.messages.per_month = perMonth;
-  result.messages.per_year = perYear;
+  result.messages.per_year = Object.fromEntries(
+    Object.entries(perYear).filter(([_, count]) => count)
+  );
 
   // Emojis
   result.messages.total_emojis = totalEmojis.length;

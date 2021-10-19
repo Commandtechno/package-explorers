@@ -18,9 +18,8 @@ module.exports = async function (folder, update, end) {
 
   let start;
 
-  result.times.account = "Loading...";
   start = Date.now();
-  await account(folder, result);
+  account(folder, result);
   result.times.account = (Date.now() - start).toFixed(1) + "ms";
   update(format(result));
 
@@ -30,7 +29,7 @@ module.exports = async function (folder, update, end) {
   update(format(result));
 
   start = Date.now();
-  await servers(folder, result);
+  servers(folder, result);
   result.times.servers = (Date.now() - start).toFixed(1) + "ms";
   update(format(result));
 

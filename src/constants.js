@@ -69,9 +69,8 @@ const months = [
 ];
 
 const offset = 2000;
-const minYear = 2014 - offset;
 const maxYear = new Date().getFullYear() - offset;
-const years = Array.from({ length: maxYear - minYear + 1 }).map((_, i) => offset + minYear + i);
+const years = Array.from({ length: maxYear }).map((_, i) => offset + i);
 
 module.exports = {
   hours,

@@ -1,3 +1,3 @@
-module.exports = (folder, result) => {
+module.exports = function (folder, result) {
   // todo
 };

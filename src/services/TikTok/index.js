@@ -1,28 +1,50 @@
 const { read, format } = require("../../util");
 
+const profile = require("./profile");
+const activity = require("./activity");
+const comments = require("./comments");
+const directMessages = require("./direct_messages");
+const videos = require("./videos");
+
 module.exports = async function (file, update, end) {
   if (!file.endsWith("user_data.json")) return end("Invalid package");
   const package = read(file);
   const result = {
+    times: {},
+
     activity: {},
-    ads: {},
-    settings: {},
+    comments: {},
+    direct_messages: {},
     profile: {},
     videos: {}
   };
 
-  const favoriteEffects = package.Activity["Favorite Effects"].FavoriteEffectList?.length ?? 0;
-  result.activity.favorite_effects = favoriteEffects.toLocaleString();
+  let start;
 
-  const favoriteHashtags = package.Activity["Favorite Hashtags"].FavoriteHashtagList?.length ?? 0;
-  result.activity.favorite_hashtags = favoriteHashtags.toLocaleString();
-
-  const favoriteSounds = package.Activity["Favorite Sounds"].FavoriteSoundList?.length ?? 0;
-  result.activity.favorite_sounds = favoriteSounds.toLocaleString();
-
-  const favoriteVideos = package.Activity["Favorite Videos"].FavoriteVideoList?.length ?? 0;
-  result.activity.favorite_videos = favoriteVideos.toLocaleString();
-
+  start = Date.now();
+  activity(package, result);
+  result.times.activity = (Date.now() - start).toFixed(1) + "ms";
   update(format(result));
+
+  start = Date.now();
+  comments(package, result);
+  result.times.comments = (Date.now() - start).toFixed(1) + "ms";
+  update(format(result));
+
+  start = Date.now();
+  directMessages(package, result);
+  result.times.direct_messages = (Date.now() - start).toFixed(1) + "ms";
+  update(format(result));
+
+  start = Date.now();
+  profile(package, result);
+  result.times.profile = (Date.now() - start).toFixed(1) + "ms";
+  update(format(result));
+
+  start = Date.now();
+  videos(package, result);
+  result.times.videos = (Date.now() - start).toFixed(1) + "ms";
+  update(format(result));
+
   end();
 };

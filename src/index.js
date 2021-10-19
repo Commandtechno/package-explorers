@@ -21,7 +21,7 @@ if (!service) return console.log("Service '" + service + "' not found");
 if (!fs.existsSync(input)) return console.log("Input '" + input + "' not found");
 
 const update = output => {
-  console.clear();
+  // console.clear();
   console.log(title);
   if (output) console.log(output);
 };

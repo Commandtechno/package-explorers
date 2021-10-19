@@ -1,7 +1,7 @@
 const { read } = require("../../util");
 const { resolve } = require("path");
 
-module.exports = (folder, result) => {
+module.exports = function (folder, result) {
   const accountPath = resolve(folder, "account");
   const userPath = resolve(accountPath, "user.json");
   const user = read(userPath);
@@ -20,8 +20,13 @@ module.exports = (folder, result) => {
   result.account.ip_address = user.ip;
 
   result.account.connections = {};
-  user.connections.forEach(({ name, type, visibility }) => {
-    if (!visibility) name += " (Hidden)";
-    result.account.connections[type] = name;
+  user.connections.forEach(({ name, type, visibility, friend_sync }) => {
+    if (!visibility || friend_sync) name += " (Hidden)";
+    if (friend_sync) name += " (Internal)";
+    if (result.account.connections[type]) {
+      if (typeof result.account.connections[type] === "string")
+        result.account.connections[type] = [result.account.connections[type]];
+      result.account.connections[type].push(name);
+    } else result.account.connections[type] = name;
   });
 };
