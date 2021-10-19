@@ -1,5 +1,9 @@
 {
   "main": "src/index",
+  "version": "beta",
+  "scripts": {
+    "build": "nexe --build --output explore.exe"
+  },
   "dependencies": {
     "@fast-csv/parse": "^4.3.6",
     "chalk": "^4.1.2",
