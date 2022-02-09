@@ -15,5 +15,5 @@ func main() {
 		panic(err)
 	}
 
-	os.WriteFile("package.json", rawPackage, os.ModePerm)
+	os.WriteFile("web/package.json", rawPackage, os.ModePerm)
 }

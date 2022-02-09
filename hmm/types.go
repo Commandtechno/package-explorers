@@ -18,12 +18,11 @@ type Block struct {
 	Data  interface{} `json:"data"`
 }
 
-type LineChart struct {
-	Labels   []string           `json:"labels"`
-	Datasets []LineChartDataset `json:"datasets"`
+type Chart struct {
+	Labels   []string       `json:"labels"`
+	Datasets []ChartDataset `json:"datasets"`
 }
 
-type LineChartDataset struct {
-	Label string `json:"label"`
-	Data  []int  `json:"data"`
+type ChartDataset struct {
+	Data []int `json:"data"`
 }
