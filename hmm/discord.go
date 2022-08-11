@@ -145,23 +145,27 @@ func DiscordMessages(packagePath string) Section {
 	monthChart.Datasets = append(monthChart.Datasets, monthChartDataset)
 	hourChart.Datasets = append(hourChart.Datasets, hourChartDataset)
 
-	var blocks []Block
-	blocks = append(blocks, Block{
+	var rows [][]Block
+	var row1 []Block
+	row1 = append(row1, Block{
 		Type: LARGE_TEXT_TYPE,
 
 		Title: "Total Messages",
 		Data:  prettyInt(total),
 	})
 
-	blocks = append(blocks, Block{
-		Type:      CHART_TYPE,
-		ChartType: LINE_CHART_TYPE,
+	row1 = append(row1, Block{
+		Type: SMALL_TEXT_TYPE,
 
-		Title: "Messages over time",
-		Data:  monthChart,
+		Title: "First Message",
+		Data:  "Content: " + first.Contents + "\n" + "Date: " + first.Timestamp.Format("Monday, January 2, 2006 3:04 PM"),
 	})
 
-	blocks = append(blocks, Block{
+	rows = append(rows, row1)
+
+	var row2 []Block
+
+	row2 = append(row2, Block{
 		Type:      CHART_TYPE,
 		ChartType: BAR_CHART_TYPE,
 
@@ -169,13 +173,16 @@ func DiscordMessages(packagePath string) Section {
 		Data:  hourChart,
 	})
 
-	blocks = append(blocks, Block{
-		Type: SMALL_TEXT_TYPE,
+	row2 = append(row2, Block{
+		Type:      CHART_TYPE,
+		ChartType: LINE_CHART_TYPE,
 
-		Title: "First Message",
-		Data:  "Content: " + first.Contents + "\n" + "Date: " + first.Timestamp.Format("Monday, January 2, 2006 3:04 PM"),
+		Title: "Messages over time",
+		Data:  monthChart,
 	})
 
-	section := Section{Title: "Messages", Blocks: blocks}
+	rows = append(rows, row2)
+
+	section := Section{Title: "Messages", Rows: rows}
 	return section
 }

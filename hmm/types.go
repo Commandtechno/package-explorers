@@ -6,8 +6,8 @@ type Package struct {
 }
 
 type Section struct {
-	Title  string  `json:"title"`
-	Blocks []Block `json:"blocks"`
+	Title string    `json:"title"`
+	Rows  [][]Block `json:"rows"`
 }
 
 type Block struct {

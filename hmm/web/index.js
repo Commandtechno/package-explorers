@@ -38,61 +38,67 @@ window.onload = () => {
     .then(package => {
       document.title = package.title + " - Package Explorer";
       for (const section of package.sections) {
-        const sectionElement = document.createElement("section");
+        const sectionElement = document.createElement("div");
         const titleElement = document.createElement("h1");
         titleElement.innerText = section.title;
 
-        for (const block of section.blocks) {
-          const blockContainerElement = document.createElement("div");
+        for (const row of section.rows) {
+          const rowElement = document.createElement("section");
 
-          const blockElement = document.createElement("div");
-          blockElement.classList.add("block");
-          blockContainerElement.appendChild(blockElement);
+          for (const block of row) {
+            const blockContainerElement = document.createElement("div");
 
-          const titleElement = document.createElement("h3");
-          titleElement.style.fontWeight = 400;
-          titleElement.style.textAlign = "center";
-          titleElement.innerText = block.title;
-          blockContainerElement.appendChild(titleElement);
+            const blockElement = document.createElement("div");
+            blockElement.classList.add("block");
+            blockContainerElement.appendChild(blockElement);
 
-          switch (block.type) {
-            case "text_large":
-              const largeTextElement = document.createElement("h1");
-              largeTextElement.style.fontSize = "96px";
-              largeTextElement.innerText = block.data;
-              blockElement.appendChild(largeTextElement);
-              break;
+            const titleElement = document.createElement("h3");
+            titleElement.style.fontWeight = 400;
+            titleElement.style.textAlign = "center";
+            titleElement.innerText = block.title;
+            blockContainerElement.appendChild(titleElement);
 
-            case "text_small":
-              const smallTextElement = document.createElement("h1");
-              smallTextElement.style.fontWeight = 400;
-              smallTextElement.innerText = block.data;
-              blockElement.appendChild(smallTextElement);
-              break;
+            switch (block.type) {
+              case "text_large":
+                const largeTextElement = document.createElement("h1");
+                largeTextElement.style.fontSize = "96px";
+                largeTextElement.innerText = block.data;
+                blockElement.appendChild(largeTextElement);
+                break;
 
-            case "chart":
-              const canvasElement = document.createElement("canvas");
-              const ctx = canvasElement.getContext("2d");
-              for (const dataset of block.data.datasets) {
-                dataset.borderColor = theme.data;
-                dataset.backgroundColor = theme.data;
-              }
+              case "text_small":
+                const smallTextElement = document.createElement("h1");
+                smallTextElement.style.fontWeight = 400;
+                smallTextElement.innerText = block.data;
+                blockElement.appendChild(smallTextElement);
+                break;
 
-              const chart = new Chart(ctx, {
-                type: block.chart_type,
-                data: block.data,
-                options
-              });
+              case "chart":
+                const canvasElement = document.createElement("canvas");
+                const ctx = canvasElement.getContext("2d");
+                for (const dataset of block.data.datasets) {
+                  dataset.borderColor = theme.data;
+                  dataset.backgroundColor = theme.data;
+                }
 
-              charts.add(chart);
-              blockElement.appendChild(canvasElement);
-              break;
+                const chart = new Chart(ctx, {
+                  type: block.chart_type,
+                  data: block.data,
+                  options
+                });
 
-            default:
-              console.log("Unknown block type: " + block.type);
+                charts.add(chart);
+                blockElement.appendChild(canvasElement);
+                break;
+
+              default:
+                console.log("Unknown block type: " + block.type);
+            }
+
+            rowElement.appendChild(blockContainerElement);
           }
 
-          sectionElement.appendChild(blockContainerElement);
+          sectionElement.appendChild(rowElement);
         }
 
         document.body.appendChild(titleElement);
