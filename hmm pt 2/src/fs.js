@@ -25,9 +25,10 @@ export class Directory {
     this.fs = dir;
   }
 
-  /** @param {(dir: Directory) => any} cb */
-  dir(name, cb) {
-    this.fs.getDirectory(name, {}, dir => cb(new Directory(dir)));
+  dir(name) {
+    return new Promise(resolve =>
+      this.fs.getDirectory(name, {}, dir => resolve(new Directory(dir)))
+    );
   }
 
   file(name, format, options) {

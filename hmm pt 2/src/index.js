@@ -20,41 +20,29 @@ drag.addEventListener(
     const fs = e.dataTransfer.items[0].webkitGetAsEntry().filesystem.root;
     const root = await detectSubfolder(new Directory(fs));
 
-    root.dir("messages", async channelsDir => {
-      for await (const channelDir of channelsDir) {
-        if (channelDir.isDirectory) {
-          const file = await channelDir.file("channel.json", "json");
-          console.log(file);
+    console.time();
+
+    let total = 0;
+    let oldest;
+    let newest;
+
+    for await (const channelDir of await root.dir("messages")) {
+      if (channelDir.isDirectory) {
+        const channel = await channelDir.file("channel.json", "json");
+        for await (const message of await channelDir.file("messages.csv", "csv-with-headers")) {
+          total++;
+          const timestamp = new Date(message.Timestamp).getTime();
+          if (!oldest || timestamp < oldest) oldest = timestamp;
+          if (!newest || timestamp > newest) newest = timestamp;
         }
-        // const channel = channelDir;
       }
-    });
-    // let entries = await convertItems(e.dataTransfer.items);
-    // if (entries.length === 1 && entries[0].isDirectory)
-    //   entries = await readEntries(entries[0].createReader());
+    }
 
-    // const dir = new Directory();
-    // await dir.load(entries);
-    // console.log(dir);
+    console.log(`${total} messages`);
+    console.log(`${oldest} messages`);
+    console.log(`${newest} messages`);
 
-    // const channelDirs = await dir.readDir("messages");
-    // let i = 0;
-    // for (const [, channelDir] of channelDirs) {
-    //   const channel = await channelDir.readFile(`channel.json`, "json");
-    //   const messages = await channelDir.readFile(`messages.csv`, "csv-with-headers", message => {
-    //     i++;
-    //   });
-    // }
-    // console.log(i);
-
-    // await parseCsvWithHeaders(
-    //   await fs.readFile("/messages/c145127225295896576/messages.csv"),
-    //   row => {
-    //     console.log(row);
-    //   }
-    // );
-
-    // console.log("hello");
+    console.timeEnd();
   },
   false
 );
