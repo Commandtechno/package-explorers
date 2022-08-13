@@ -1,8 +1,8 @@
+import "./__jsx";
+
 import { detectSubfolder, Directory } from "./util/fs.js";
-import { Chart, registerables } from "chart.js";
+import { Chart } from "./components/Chart.jsx";
 import dayjs from "dayjs";
-import { test } from "./components/test.jsx";
-Chart.register(...registerables);
 
 const drag = document.getElementById("drag");
 
@@ -54,11 +54,6 @@ drag.addEventListener(
 
     console.timeEnd();
 
-    const canvas = <canvas width={800} height={800} />;
-    document.body.appendChild(canvas);
-    drag.remove();
-
-    // const monthKeys = oldest.month()
     let labels = [];
     let current = oldest.clone();
     while (current.year() <= newest.year() || current.month() <= newest.month()) {
@@ -66,15 +61,16 @@ drag.addEventListener(
       current = current.add(1, "month");
     }
 
-    const chart = new Chart(canvas, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [{ data: labels.map(label => months.get(label)) }]
-      }
-    });
-
-    console.log(test());
+    document.body.appendChild(
+      <Chart
+        type="bar"
+        data={{
+          labels,
+          datasets: [{ label: "Messages Per Month", data: labels.map(label => months.get(label)) }]
+        }}
+      />
+    );
+    drag.remove();
   },
   false
 );
