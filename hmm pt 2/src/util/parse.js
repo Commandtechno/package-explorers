@@ -32,6 +32,7 @@ export async function* parseCsvWithHeaders(file, cb) {
   const columns = headers.length;
 
   // https://github.com/pckhoi/gocsv/blob/main/src/reader.ts#L352
+  // not using the built in method because its hard to do async generators
   do {
     await reader.r.fill();
     while (true) {
