@@ -25,6 +25,7 @@ export class Directory {
     this.fs = dir;
   }
 
+  /** @return {Promise<Directory>} */
   dir(name) {
     return new Promise(resolve =>
       this.fs.getDirectory(name, {}, dir => resolve(new Directory(dir)))
@@ -36,13 +37,13 @@ export class Directory {
       this.fs.getFile(
         name,
         {},
-        entry => entry.file(file => resolve(parse(file, format, options))),
+        entry => entry.file(file => resolve(format ? parse(file, format, options) : file)),
         reject
       )
     );
   }
 
-  /** @return {AsyncGenerator<Directory>} */
+  /** @return {AsyncGenerator<Directory, undefined, undefined>} */
   async *[Symbol.asyncIterator]() {
     const reader = this.fs.createReader();
     while (true) {

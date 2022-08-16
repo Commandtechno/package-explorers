@@ -12,11 +12,15 @@ export function __jsx<T extends keyof JSX.IntrinsicElements>(
   props: Partial<HTMLElementTagNameMap[T]>,
   ...children: (string | Node)[]
 ): HTMLElementTagNameMap[T] {
-  if (typeof tag === "function") return tag(props);
-  const element = document.createElement<T>(tag);
+  const element =
+    typeof tag === "string" ? document.createElement<T>(tag) : props ? tag(props) : tag();
   if (props) Object.entries(props).forEach(([key, value]) => (element[key] = value));
-  element.append(...children.filter(child => child));
+  element.append(...children.flat().filter(child => child != null));
   return element;
 }
 
-Object.assign(window, { __jsx });
+export function __fragment() {
+  return document.createDocumentFragment();
+}
+
+Object.assign(window, { __jsx, __fragment });
