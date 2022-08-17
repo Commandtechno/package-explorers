@@ -1,13 +1,22 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
 
+:root {
+  --background-primary: rgb(44 47 51);
+  --background-secondary: rgb(35 39 42);
+  --background-tertiary: rgb(24 28 32);
+  --foreground-secondary: rgb(185, 187, 190);
+  --foreground-primary: rgb(255, 255, 255);
+  --foreground-accent: #5865f2;
+}
+
 html,
 body {
   color-scheme: dark;
   margin: 0;
-  color: white;
-  background-color: #0c0d0e;
+  color: var(--foreground-primary);
+  background-color: var(--background-primary);
   font-family: "Inter", sans-serif;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 #drag {
@@ -39,7 +48,7 @@ body {
   width: 300px;
   height: 300px;
   padding: 20px;
-  background-color: #040405;
+  background-color: var(--background-secondary);
   border-radius: 10px;
   box-sizing: border-box;
   overflow: auto;
@@ -51,7 +60,7 @@ body {
 }
 
 .tile b {
-  color: #5865f2;
+  color: var(--foreground-accent);
 }
 
 .tile-1 {
@@ -72,8 +81,35 @@ body {
   vertical-align: middle;
 }
 
+.account-avatar {
+  width: 66px;
+  height: 66px;
+  vertical-align: middle;
+  margin-right: 12px;
+  border-radius: 33px;
+}
+
+.account-discriminator {
+  color: var(--foreground-secondary);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.field-label {
+  color: var(--foreground-secondary);
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
 table {
   width: 100%;
+  border-spacing: 0px;
 }
 
 table .end {
@@ -82,8 +118,9 @@ table .end {
 
 tr > * {
   padding: 5px;
+  border-radius: 5px;
 }
 
 tr:nth-child(odd) {
-  background: #0c0d0e;
+  background: var(--background-tertiary);
 }

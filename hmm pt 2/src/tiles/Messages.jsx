@@ -2,7 +2,8 @@ import dayjs from "dayjs";
 import { Chart } from "../components/Chart";
 import { Row } from "../components/Row";
 import { Tile } from "../components/Tile";
-import { Directory } from "../util/fs";
+import { SHORT_DATE_TIME } from "../util/dateFormats";
+import { CustomDirectory } from "../util/fs";
 import {
   formatNum,
   getWords,
@@ -12,7 +13,7 @@ import {
   rangeArray
 } from "../util/helpers";
 
-/** @param {{ root: Directory }} */
+/** @param {{ root: CustomDirectory }} */
 export async function extractMessages({ root }) {
   let totalMessages = 0;
   let totalWords = 0;
@@ -30,7 +31,11 @@ export async function extractMessages({ root }) {
   const channelIndex = await root.file("messages/index.json", "json");
   for await (const channelDir of await root.dir("messages")) {
     if (channelDir.isDirectory) {
-      for await (const message of await channelDir.file("messages.csv", "csv-with-headers")) {
+      const messages = await channelDir
+        .file("messages.csv")
+        .then(file => file.csv({ withHeaders: true }));
+
+      for await (const message of messages) {
         totalMessages++;
         totalCharacters += message.Contents.length;
         totalAttachments += message.Attachments.split(", ").length;
@@ -55,8 +60,12 @@ export async function extractMessages({ root }) {
 
         const date = dayjs(message.Timestamp);
         if (!oldest || date.isBefore(oldest.date)) {
-          const channel = await channelDir.file("channel.json", "json");
-          oldest = { date, message, channel: channelIndex[channel.id] ?? channel.name };
+          const channel = await channelDir.file("channel.json").then(file => file.json());
+          oldest = {
+            date,
+            message,
+            channel: channel.name ?? channelIndex[channel.id] ?? "Unknown"
+          };
         }
         if (!newestDate || date.isAfter(newestDate)) newestDate = date;
 
@@ -118,8 +127,8 @@ export async function extractMessages({ root }) {
             <b>{formatNum(totalDefaultEmojis)}</b> default emojis.
           </div>
           <div>
-            Your first message was <b>{oldest.message.Contents}</b> at{" "}
-            <b>{oldest.date.format("MMMM D, YYYY")}</b> in <b>{oldest.channel}</b>
+            Your first message was <b>{oldest.message.Contents}</b> on{" "}
+            <b>{oldest.date.format(SHORT_DATE_TIME)}</b> in <b>{oldest.channel}</b>
           </div>
         </Tile>
         <Tile>

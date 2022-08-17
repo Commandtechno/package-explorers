@@ -1,6 +1,8 @@
 import { parse } from "twemoji-parser";
 import TWEMOJI_REGEX from "twemoji-parser/dist/lib/regex";
 import { STOP_WORDS } from "./stopWords";
+import { DiscordSnowflake } from "@sapphire/snowflake";
+import dayjs from "dayjs";
 
 const GLOBAL_CUSTOM_EMOJI_REGEX = /<a?:\w+:\d+>/g;
 const CUSTOM_EMOJI_REGEX = /<a?:(?<name>\w+):(?<id>\d+)>/;
@@ -38,4 +40,8 @@ export function getEmojiUrl(emoji) {
   if (customEmoji) return `https://cdn.discordapp.com/emojis/${customEmoji.groups.id}`;
   const defaultEmoji = parse(emoji)[0];
   if (defaultEmoji) return defaultEmoji.url;
+}
+
+export function getSnowflakeTimestamp(snowflake) {
+  return dayjs(Number(DiscordSnowflake.deconstruct(snowflake).timestamp));
 }
