@@ -19,7 +19,7 @@ export async function extractAccount({ root }) {
   const avatarUrl = URL.createObjectURL(await avatar.file());
   return () => (
     <Row>
-      <Tile>
+      <Tile size={2}>
         <h1>
           <img className="account-avatar" src={avatarUrl} alt="Avatar" />
           {user.username}
@@ -30,6 +30,7 @@ export async function extractAccount({ root }) {
           <Field label="email" value={user.email} />
           <Field label="phone" value={user.phone} />
           <Field label="created" value={getSnowflakeTimestamp(user.id).format(SHORT_DATE_TIME)} />
+          <Field label="ip address" value={user.ip} />
         </div>
       </Tile>
       <Tile>
@@ -40,6 +41,19 @@ export async function extractAccount({ root }) {
               <tr>
                 <td>{flag}</td>
                 <td>{description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Tile>
+      <Tile>
+        <h1>Connections</h1>
+        <table>
+          <tbody>
+            {user.connections.map(({ type, name }) => (
+              <tr>
+                <td>{type}</td>
+                <td>{name}</td>
               </tr>
             ))}
           </tbody>
