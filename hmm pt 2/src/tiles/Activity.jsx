@@ -57,6 +57,4 @@ export async function extractActivity({ root }) {
         currentLine = line;
       }
     });
-
-  console.log(eventCounts);
 }
