@@ -2,7 +2,8 @@ import dayjs from "dayjs";
 import { Chart } from "../components/Chart";
 import { Row } from "../components/Row";
 import { Tile } from "../components/Tile";
-import { SHORT_DATE_TIME } from "../util/dateFormats";
+import { BLURPLE } from "../constants/COLORS";
+import { SHORT_DATE_TIME } from "../constants/DATE_FORMATS";
 import { CustomDirectory } from "../util/fs";
 import {
   formatNum,
@@ -10,7 +11,8 @@ import {
   getCustomEmojis,
   getDefaultEmojis,
   getEmojiUrl,
-  rangeArray
+  rangeArray,
+  getMentionCount
 } from "../util/helpers";
 
 /** @param {{ root: CustomDirectory }} */
@@ -19,6 +21,7 @@ export async function extractMessages({ root }) {
   let totalWords = 0;
   let totalCharacters = 0;
   let totalAttachments = 0;
+  let totalMentions = 0;
   let totalCustomEmojis = 0;
   let totalDefaultEmojis = 0;
   let oldest;
@@ -39,6 +42,7 @@ export async function extractMessages({ root }) {
         totalMessages++;
         totalCharacters += message.Contents.length;
         totalAttachments += message.Attachments.split(", ").length;
+        totalMentions += getMentionCount(message.Contents);
 
         for (const word of getWords(message.Contents)) {
           totalWords++;
@@ -127,6 +131,9 @@ export async function extractMessages({ root }) {
             <b>{formatNum(totalDefaultEmojis)}</b> default emojis.
           </div>
           <div>
+            Overall, you pinged <b>{formatNum(totalMentions)}</b> users, roles, and channels
+          </div>
+          <div>
             Your first message was <b>{oldest.message.Contents}</b> on{" "}
             <b>{oldest.date.format(SHORT_DATE_TIME)}</b> in <b>{oldest.channel}</b>
           </div>
@@ -166,13 +173,13 @@ export async function extractMessages({ root }) {
         <Tile>
           <Chart
             type="bar"
+            title="Messages per month"
             data={{
               labels: monthLabels,
               datasets: [
                 {
-                  label: "Messages Per Month",
                   data: monthLabels.map(label => monthValues.get(label)),
-                  backgroundColor: "#5865F2"
+                  backgroundColor: BLURPLE
                 }
               ]
             }}
@@ -181,15 +188,10 @@ export async function extractMessages({ root }) {
         <Tile>
           <Chart
             type="bar"
+            title="Messages per hour"
             data={{
               labels: hourLabels,
-              datasets: [
-                {
-                  label: "Messages Per Hour",
-                  data: hourData,
-                  backgroundColor: "#5865F2"
-                }
-              ]
+              datasets: [{ data: hourData, backgroundColor: BLURPLE }]
             }}
           />
         </Tile>

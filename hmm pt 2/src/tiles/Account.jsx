@@ -1,10 +1,13 @@
+import dayjs from "dayjs";
+import { Chart } from "../components/Chart";
 import { Field } from "../components/Field";
 import { Row } from "../components/Row";
 import { Tile } from "../components/Tile";
-import { SHORT_DATE_TIME } from "../util/dateFormats";
+import { BLURPLE } from "../constants/COLORS";
+import { SHORT_DATE_TIME } from "../constants/DATE_FORMATS";
 import { extractUserFlags } from "../util/flags";
 import { CustomDirectory } from "../util/fs";
-import { getSnowflakeTimestamp } from "../util/helpers";
+import { formatCurrency, formatNum, getSnowflakeTimestamp } from "../util/helpers";
 
 function formatDiscriminator(discriminator) {
   return "#" + discriminator.toString().padStart(4, "0");
@@ -13,29 +16,52 @@ function formatDiscriminator(discriminator) {
 /** @param {{ root: CustomDirectory }} */
 export async function extractAccount({ root }) {
   const accountDir = await root.dir("account");
-  const user = await root.file("account/user.json").then(res => res.json());
-  console.log(user);
-  const avatar = await accountDir.findFile(name => /avatar\..*/.test(name));
+  /** @type {import("../util/types").Account} */
+  const user = await accountDir.file("user.json").then(res => res.json());
+  const avatar = await accountDir.findFile(name => /^avatar\..*$/.test(name));
   const avatarUrl = URL.createObjectURL(await avatar.file());
+
+  const topGames = user.user_activity_application_statistics
+    .sort((a, b) => b.total_duration - a.total_duration)
+    .slice(0, 10);
+
+  const moneySpent = formatCurrency(
+    user.payments.reduce(
+      (total, { amount, amount_refunded }) => total + amount - amount_refunded,
+      0
+    ) / 100,
+    user.payments[0]?.currency
+  );
+
+  for (const game of topGames)
+    game.application_name = await fetch(
+      `https://discord.com/api/v10/applications/${game.application_id}/rpc`
+    )
+      .then(res => res.json())
+      .then(res => res.name);
+
   return () => (
-    <Row>
-      <Tile size={2}>
-        <h1>
-          <img className="account-avatar" src={avatarUrl} alt="Avatar" />
-          {user.username}
-          <span className="account-discriminator">{formatDiscriminator(user.discriminator)}</span>
-        </h1>
-        <div className="field-group">
-          <Field label="id" value={user.id} />
-          <Field label="email" value={user.email} />
-          <Field label="phone" value={user.phone} />
-          <Field label="created" value={getSnowflakeTimestamp(user.id).format(SHORT_DATE_TIME)} />
-          <Field label="ip address" value={user.ip} />
-        </div>
-      </Tile>
-      <Tile>
-        <h1>Flags</h1>
-        <table>
+    <>
+      <Row>
+        <Tile size={2}>
+          <h1>
+            <img className="account-avatar" src={avatarUrl} alt="Avatar" />
+            {user.username}
+            <span className="account-discriminator">{formatDiscriminator(user.discriminator)}</span>
+          </h1>
+          <div className="field-group">
+            <Field label="id" value={user.id} />
+            <Field label="email" value={user.email} />
+            <Field label="phone" value={user.phone} />
+            <Field label="created" value={getSnowflakeTimestamp(user.id).format(SHORT_DATE_TIME)} />
+            <Field label="ip address" value={user.ip} />
+            <Field label="friends" value={formatNum(user.relationships.length)} />
+            <Field label="money spent" value={moneySpent} />
+          </div>
+        </Tile>
+        <Tile>
+          <h1>Flags</h1>
+          {/* <table>
           <tbody>
             {extractUserFlags(user.flags).map(({ flag, description }) => (
               <tr>
@@ -44,21 +70,54 @@ export async function extractAccount({ root }) {
               </tr>
             ))}
           </tbody>
-        </table>
-      </Tile>
-      <Tile>
-        <h1>Connections</h1>
-        <table>
+        </table> */}
+          <div className="field-group">
+            {extractUserFlags(user.flags).map(({ flag, description }) => (
+              <Field label={flag} value={description} />
+            ))}
+          </div>
+        </Tile>
+        <Tile>
+          <h1>Connections</h1>
+          {/* <table>
           <tbody>
             {user.connections.map(({ type, name }) => (
               <tr>
-                <td>{type}</td>
+                <td>{CONNECTION_TYPES[type] ?? type}</td>
                 <td>{name}</td>
               </tr>
             ))}
           </tbody>
-        </table>
-      </Tile>
-    </Row>
+        </table> */}
+          <div className="field-group">
+            {user.connections.map(({ type, name }) => (
+              <Field label={type} value={name} />
+            ))}
+          </div>
+        </Tile>
+      </Row>
+      <Row>
+        <Tile>
+          <Chart
+            type="bar"
+            title={`Top ${topGames.length} games`}
+            data={{
+              labels: topGames.map(game => game.application_name ?? "Unknown"),
+              datasets: [
+                {
+                  data: topGames.map(game => game.total_duration),
+                  backgroundColor: BLURPLE
+                }
+              ]
+            }}
+            options={{
+              scales: {
+                y: { ticks: { callback: label => dayjs.duration(label, "seconds").humanize() } }
+              }
+            }}
+          />
+        </Tile>
+      </Row>
+    </>
   );
 }

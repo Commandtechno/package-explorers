@@ -1,4 +1,4 @@
-export interface Root {
+export interface Account {
   id: string;
   username: string;
   discriminator: number;

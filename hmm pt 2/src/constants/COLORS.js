@@ -1,0 +1,1 @@
+export const BLURPLE = "#5865F2";

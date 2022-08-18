@@ -40,6 +40,7 @@ export class CustomFile {
     return new Promise((resolve, reject) => this.entry.file(resolve, reject));
   }
 
+  /** @returns {Promise<ReadableStream<Uint8Array>>} */
   async stream() {
     return await this.file().then(file => file.stream());
   }
@@ -76,6 +77,19 @@ export class CustomFile {
         }
       }
     } while (!reader.r.eof);
+  }
+
+  async *[Symbol.asyncIterator]() {
+    const stream = new TextDecoderStream();
+    const reader = stream.readable.getReader();
+    const file = await this.stream();
+    file.pipeTo(stream.writable);
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      yield value;
+    }
   }
 }
 

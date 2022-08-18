@@ -1,9 +1,10 @@
 import { parse } from "twemoji-parser";
 import TWEMOJI_REGEX from "twemoji-parser/dist/lib/regex";
-import { STOP_WORDS } from "./stopWords";
+import { STOP_WORDS } from "../constants/STOP_WORDS";
 import { DiscordSnowflake } from "@sapphire/snowflake";
 import dayjs from "dayjs";
 
+const MENTION_REGEX = /\<(@|@!|#|@&)\d+\>/g;
 const GLOBAL_CUSTOM_EMOJI_REGEX = /<a?:\w+:\d+>/g;
 const CUSTOM_EMOJI_REGEX = /<a?:(?<name>\w+):(?<id>\d+)>/;
 const WORD_REGEX = /(?<=\s|^)\w+(?=\s|$)/g;
@@ -19,6 +20,14 @@ export function rangeArray(start, end) {
 
 export function formatNum(num) {
   return num.toLocaleString();
+}
+
+export function formatCurrency(amount, currency) {
+  return amount.toLocaleString(undefined, { style: "currency", currency });
+}
+
+export function getMentionCount(text) {
+  return text.match(MENTION_REGEX)?.length ?? 0;
 }
 
 export function getCustomEmojis(text) {
