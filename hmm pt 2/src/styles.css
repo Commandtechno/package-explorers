@@ -64,6 +64,10 @@ body {
   color: var(--foreground-accent);
 }
 
+.tile a {
+  text-underline-offset: 2px;
+}
+
 .tile-1 {
   flex: 1 1 auto;
 }

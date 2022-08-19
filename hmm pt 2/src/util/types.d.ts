@@ -1,3 +1,10 @@
+export interface Message {
+  ID: string;
+  Timestamp: string;
+  Contents: string;
+  Attachments: string;
+}
+
 export interface Account {
   id: string;
   username: string;

@@ -11,17 +11,11 @@ export async function extractActivity({ root }) {
     .then(file => file.json())
     .then(user => getSnowflakeTimestamp(user.id));
 
-  // /** @type {import('../../event_types.json')} */
   let events = {
     activity_updated: 0,
-    app_crashed: 0,
-    app_exception_thrown: 0,
-    app_native_crash: 0,
-    app_opened: 0,
     captcha_served: 0,
     captcha_solved: 0,
     channel_opened: 0,
-    guild_joined: 0,
     guild_viewed: 0,
     join_call: 0,
     join_thread: 0,
@@ -30,13 +24,9 @@ export async function extractActivity({ root }) {
     launch_game: 0,
     message_edited: 0,
     message_deleted: 0,
-    open_modal: 0,
-    open_popout: 0,
     quickswitcher_opened: 0,
     add_reaction: 0,
     search_started: 0,
-    session_end: 0,
-    session_start: 0,
     slash_command_used: 0
   };
 
@@ -53,7 +43,7 @@ export async function extractActivity({ root }) {
       // guild_joined: 1297,
       guild_viewed: 47901,
       join_call: 370,
-      join_thread: 151,
+      // join_thread: 151,
       join_voice_channel: 4748,
       keyboard_shortcut_used: 9803,
       launch_game: 5116,
@@ -62,11 +52,11 @@ export async function extractActivity({ root }) {
       // open_modal: 19995,
       // open_popout: 71701,
       quickswitcher_opened: 3313,
-      add_reaction: 14762,
-      search_started: 15296,
+      add_reaction: 14762
+      // search_started: 15296,
       // session_end: 14798,
       // session_start: 14858,
-      slash_command_used: 141
+      // slash_command_used: 141
     };
   else {
     let currentLine = "";
@@ -83,7 +73,6 @@ export async function extractActivity({ root }) {
       });
   }
 
-  // const totalAppIssues = events.app_crashed + events.app_exception_thrown + events.app_native_crash;
   const totalDays = dayjs().diff(createdAt, "days");
   const averageDailyGuilds = Math.round(events.guild_viewed / totalDays);
   const averageDailyChannels = Math.round(events.channel_opened / totalDays);
@@ -98,12 +87,6 @@ export async function extractActivity({ root }) {
         <div>
           Your status was updated <b>{formatNum(events.activity_updated)}</b> times.
         </div>
-        {/* <div>
-          Uh oh! Discord ran into <b>{formatNum(totalAppIssues)}</b> crashes and errors.
-        </div>
-        <div>
-          You opened this fucking app <b>{formatNum(events.app_opened)}</b> times for some reason.
-        </div> */}
         <div>
           Are you a robot? You were served <b>{formatNum(events.captcha_served)}</b> captchas and
           solved <b>{formatNum(events.captcha_solved)}</b> of them.
@@ -130,29 +113,18 @@ export async function extractActivity({ root }) {
           In total, you edited <b>{formatNum(events.message_edited)}</b> messages and deleted{" "}
           <b>{formatNum(events.message_deleted)}</b> of them.
         </div>
-        {/* <div>
-          I can't think of a message for this one modals: <b>{formatNum(events.open_modal)}</b>{" "}
-          popoust: <b>{formatNum(events.open_popout)}</b>
-        </div> */}
         <div>
-          You opened the quickswitcher <b>{formatNum(events.quickswitcher_opened)}</b> times.
+          You opened the quick switcher <b>{formatNum(events.quickswitcher_opened)}</b> times.
         </div>
         {/* <div>
-          You added <b>{formatNum()}</b> reactions to messages.
-        </div> */}
-        <div>
           You searched <b>{formatNum(events.search_started)}</b> times.
         </div>
-        {/* <div>
-          You ended your session <b>{formatNum(events.session_end)}</b> times and started
-          <b>{formatNum(events.session_start)}</b> times.
-        </div> */}
         <div>
           You joined <b>{formatNum(events.join_thread)}</b> threads.
         </div>
         <div>
           You used <b>{formatNum(events.slash_command_used)}</b> slash commands.
-        </div>
+        </div> */}
       </Tile>
     )
   };

@@ -11,7 +11,8 @@ import {
   getDefaultEmojis,
   getEmojiUrl,
   rangeArray,
-  getMentionCount
+  getMentionCount,
+  getMessageLink
 } from "../util/helpers";
 
 /** @param {{ root: CustomDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
@@ -28,7 +29,7 @@ export async function extractMessages({
   let totalMentions = 0;
   let totalCustomEmojis = 0;
   let totalDefaultEmojis = 0;
-  let oldest;
+  let oldestMessage;
   let newestDate;
   let hourlyValues = new Map(rangeArray(24).map(i => [i, 0]));
   let monthlyValues = new Map();
@@ -38,6 +39,7 @@ export async function extractMessages({
   const channelIndex = await root.file("messages/index.json", "json");
   for await (const channelDir of await root.dir("messages")) {
     if (channelDir.isDirectory) {
+      /** @type {AsyncGenerator<import("../util/types").Message>} */
       const messages = await channelDir
         .file("messages.csv")
         .then(file => file.csv({ withHeaders: true }));
@@ -67,14 +69,8 @@ export async function extractMessages({
         }
 
         const date = dayjs(message.Timestamp);
-        if (!oldest || date.isBefore(oldest.date)) {
-          const channel = await channelDir.file("channel.json").then(file => file.json());
-          oldest = {
-            date,
-            message,
-            channel: channel.name ?? channelIndex[channel.id] ?? "Unknown"
-          };
-        }
+        if (!oldestMessage || date.isBefore(oldestMessage.date))
+          oldestMessage = { date, message, channelDir };
         if (!newestDate || date.isAfter(newestDate)) newestDate = date;
 
         const hourlyKey = date.hour();
@@ -88,7 +84,15 @@ export async function extractMessages({
     }
   }
 
-  const totalDays = newestDate.diff(oldest.date, "days");
+  const oldestChannel = await oldestMessage.channelDir
+    .file("channel.json")
+    .then(file => file.json());
+
+  oldestMessage.guild_id = oldestChannel.guild?.id;
+  oldestMessage.channel_id = oldestChannel.id;
+  oldestMessage.channel_name = oldestChannel.name ?? channelIndex[oldestChannel.id];
+
+  const totalDays = newestDate.diff(oldestMessage.date, "days");
   const averageDailyMessages = Math.round(totalMessages / totalDays);
 
   let hourlyLabels = [];
@@ -100,7 +104,7 @@ export async function extractMessages({
 
   let monthlyLabels = [];
   for (
-    let currentDate = oldest.date.clone();
+    let currentDate = oldestMessage.date.clone();
     currentDate.isBefore(newestDate);
     currentDate = currentDate.add(1, "month")
   )
@@ -144,8 +148,20 @@ export async function extractMessages({
           You added <b>{formatNum(totalReactions)}</b> reactions to messages.
         </div>
         <div>
-          Your first message was <b>{oldest.message.Contents}</b> on{" "}
-          <b>{oldest.date.format(SHORT_DATE_TIME)}</b> in <b>{oldest.channel}</b>
+          Your first message was{" "}
+          <b>
+            <a
+              href={getMessageLink(
+                oldestMessage.guild_id,
+                oldestMessage.channel_id,
+                oldestMessage.message.ID
+              )}
+            >
+              {oldestMessage.message.Contents}
+            </a>
+          </b>{" "}
+          on <b>{oldestMessage.date.format(SHORT_DATE_TIME)}</b> in{" "}
+          <b>{oldestMessage.channel_name ?? "Unknown"}</b>
         </div>
       </Tile>
     ),

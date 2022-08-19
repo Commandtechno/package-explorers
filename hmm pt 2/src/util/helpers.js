@@ -51,6 +51,10 @@ export function getEmojiUrl(emoji) {
   if (defaultEmoji) return defaultEmoji.url;
 }
 
+export function getMessageLink(guildId, channelId, messageId) {
+  return `https://discord.com/channels/${guildId ?? "@me"}/${channelId}/${messageId}`;
+}
+
 export function getSnowflakeTimestamp(snowflake) {
   return dayjs(Number(DiscordSnowflake.deconstruct(snowflake).timestamp));
 }
