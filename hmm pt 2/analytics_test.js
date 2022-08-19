@@ -9,5 +9,5 @@ readline
   })
   .on("line", line => {
     const event = JSON.parse(line);
-    if (event.event_type === "af_dm_visited") console.log(event);
+    console.log(event);
   });

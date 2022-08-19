@@ -45,8 +45,8 @@ body {
 }
 
 .tile {
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
   padding: 20px;
   background-color: var(--background-secondary);
   border-radius: 10px;
