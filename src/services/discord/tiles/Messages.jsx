@@ -14,7 +14,6 @@ import {
   getMentionCount,
   getMessageUrl
 } from "../helpers";
-import { Test } from "@common/components/ApexChart";
 
 /** @param {{ root: CustomDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
 export async function extractMessages({
@@ -276,19 +275,6 @@ export async function extractMessages({
             ]
           }}
         />
-        {/* <h1>Messages per month</h1>
-        <Test
-          series={[
-            {
-              name: "Messages",
-              data: monthlyLabels.map(label => ({ x: label, y: monthlyCounter.get(label) }))
-            }
-          ]}
-          chart={{
-            type: "bar",
-            height: 200
-          }}
-        ></Test> */}
       </Tile>
     ),
     MessagesPerHour: () => (
