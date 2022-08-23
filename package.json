@@ -1,13 +1,19 @@
 {
-  "main": "src/index",
-  "version": "beta",
+  "name": "hmm-pt-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "build": "nexe --build --output explore.exe"
+    "watch": "esbuild ./src/index.jsx --outfile=./src/build.js --watch --bundle --jsx-factory=__jsx --jsx-fragment=__fragment"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@fast-csv/parse": "^4.3.6",
-    "chalk": "^4.1.2",
-    "extract-zip": "^2.0.1",
-    "figlet": "^1.5.2"
+    "@sapphire/snowflake": "^3.2.2",
+    "chart.js": "^3.9.1",
+    "dayjs": "^1.11.5",
+    "gocsv": "^0.1.1",
+    "twemoji-parser": "^14.0.0"
   }
 }
