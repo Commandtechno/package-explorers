@@ -1,21 +1,19 @@
 import dayjs from "dayjs";
-import { Chart } from "../components/Chart";
-import { Tile } from "../components/Tile";
+import { Chart } from "@common/components/Chart";
+import { Tile } from "@common/components/Tile";
 import { BLURPLE } from "../constants/COLORS";
-import { SHORT_DATE_TIME } from "../constants/DATE_FORMATS";
+import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
 import { ChannelTypes } from "../enums/ChannelTypes";
-import { Counter } from "../util/counter";
-import { CustomDirectory } from "../util/fs";
+import { Counter } from "@common/util/counter";
+import { CustomDirectory } from "@common/util/fs";
+import { formatNum, getWords, rangeArray } from "@common/util/helpers";
 import {
-  formatNum,
-  getWords,
   getCustomEmojis,
   getDefaultEmojis,
   getEmojiUrl,
-  rangeArray,
   getMentionCount,
   getMessageUrl
-} from "../util/helpers";
+} from "../helpers";
 
 /** @param {{ root: CustomDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
 export async function extractMessages({

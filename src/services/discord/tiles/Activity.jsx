@@ -1,7 +1,10 @@
-import { CustomDirectory } from "../util/fs";
-import { Tile } from "../components/Tile";
-import { formatNum, getSnowflakeTimestamp } from "../util/helpers";
 import dayjs from "dayjs";
+
+import { CustomDirectory } from "@common/util/fs";
+import { Tile } from "@common/components/Tile";
+import { formatNum } from "@common/util/helpers";
+
+import { getSnowflakeTimestamp } from "../helpers";
 
 /** @param {{ root: CustomDirectory }} */
 export async function extractActivity({ root }) {
