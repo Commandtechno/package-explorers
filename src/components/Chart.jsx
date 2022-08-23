@@ -1,7 +1,7 @@
 const GRID_COLOR = "rgba(255,255,255,0.1)";
 
-import { Chart as CreateChart, registerables } from "chart.js";
-CreateChart.register(...registerables);
+import { Chart as CreateChart, BarElement } from "chart.js";
+CreateChart.register(BarElement);
 
 /** @param {import("chart.js").ChartConfiguration & { title: string }} props */
 export function Chart(props) {
