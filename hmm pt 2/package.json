@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch": "esbuild ./src/index.jsx --outfile=./src/_.js --watch --bundle --jsx-factory=__jsx --jsx-fragment=__fragment"
+    "watch": "esbuild ./src/index.jsx --outfile=./src/build.js --watch --bundle --jsx-factory=__jsx --jsx-fragment=__fragment"
   },
   "keywords": [],
   "author": "",
