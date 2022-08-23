@@ -1,4 +1,4 @@
-export const RELATIONSHIP_TYPES = {
+export const RelationshipTypes = {
   BLOCKED: 2,
   FRIEND: 1,
   IMPLICIT: 5,

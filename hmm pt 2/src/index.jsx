@@ -29,16 +29,28 @@ drag.addEventListener(
     const fs = e.dataTransfer.items[0].webkitGetAsEntry().filesystem.root;
     const root = await detectSubfolder(new CustomDirectory(fs));
 
+    console.time();
+
     const { Account, Flags, Connections, TopGames } = await extractAccount({ root });
     const { totalReactions, totalMessagesEdited, totalMessagesDeleted, Analytics } =
       await extractActivity({ root });
-    const { Messages, TopWords, TopEmojis, MessagesPerMonth, MessagesPerHour } =
-      await extractMessages({
-        root,
-        totalReactions,
-        totalMessagesEdited,
-        totalMessagesDeleted
-      });
+    const {
+      Messages,
+      TopWords,
+      TopEmojis,
+      TopDms,
+      TopChannels,
+      TopGuilds,
+      MessagesPerMonth,
+      MessagesPerHour
+    } = await extractMessages({
+      root,
+      totalReactions,
+      totalMessagesEdited,
+      totalMessagesDeleted
+    });
+
+    console.timeEnd();
 
     document.body.appendChild(
       <div className="container">
@@ -52,9 +64,14 @@ drag.addEventListener(
           <Messages />
         </Row>
         <Row>
-          <TopGames />
           <TopWords />
+          <TopGames />
           <TopEmojis />
+        </Row>
+        <Row>
+          <TopDms />
+          <TopChannels />
+          <TopGuilds />
         </Row>
         <Row>
           <MessagesPerMonth />

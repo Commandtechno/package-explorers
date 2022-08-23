@@ -1,7 +1,7 @@
 import { USER_FLAGS } from "../constants/USER_FLAGS";
 
-export function hasFlag(flags, FLAG) {
-  return (BigInt(flags) & FLAG) === FLAG;
+export function hasFlag(flags, bit) {
+  return (BigInt(flags) & bit) === bit;
 }
 
 export function extractUserFlags(flags) {

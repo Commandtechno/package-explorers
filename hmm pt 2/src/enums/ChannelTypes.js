@@ -1,4 +1,4 @@
-export const CHANNEL_TYPES = {
+export const ChannelTypes = {
   DM: 1,
   GROUP_DM: 3,
   GUILD_TEXT: 0,

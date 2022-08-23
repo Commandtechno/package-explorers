@@ -82,7 +82,7 @@ export async function extractAccount({ root }) {
       </Tile>
     ),
     TopGames: () => (
-      <Tile>
+      <Tile size={2}>
         <Chart
           type="bar"
           title={`Top ${topGames.length} games`}

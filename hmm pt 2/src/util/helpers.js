@@ -51,7 +51,7 @@ export function getEmojiUrl(emoji) {
   if (defaultEmoji) return defaultEmoji.url;
 }
 
-export function getMessageLink(guildId, channelId, messageId) {
+export function getMessageUrl(guildId, channelId, messageId) {
   return `https://discord.com/channels/${guildId ?? "@me"}/${channelId}/${messageId}`;
 }
 

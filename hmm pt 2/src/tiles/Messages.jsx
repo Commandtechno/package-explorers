@@ -3,6 +3,8 @@ import { Chart } from "../components/Chart";
 import { Tile } from "../components/Tile";
 import { BLURPLE } from "../constants/COLORS";
 import { SHORT_DATE_TIME } from "../constants/DATE_FORMATS";
+import { ChannelTypes } from "../enums/ChannelTypes";
+import { Counter } from "../util/counter";
 import { CustomDirectory } from "../util/fs";
 import {
   formatNum,
@@ -12,7 +14,7 @@ import {
   getEmojiUrl,
   rangeArray,
   getMentionCount,
-  getMessageLink
+  getMessageUrl
 } from "../util/helpers";
 
 /** @param {{ root: CustomDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
@@ -31,14 +33,26 @@ export async function extractMessages({
   let totalDefaultEmojis = 0;
   let oldestMessage;
   let newestDate;
-  let hourlyValues = new Map(rangeArray(24).map(i => [i, 0]));
-  let monthlyValues = new Map();
-  let wordCounts = new Map();
-  let emojiCounts = new Map();
+  let hourlyCounter = new Counter(rangeArray(24).map(i => [i, 0]));
+  let monthlyCounter = new Counter();
+  let wordCounter = new Counter();
+  let emojiCounter = new Counter();
+  let dmMessageCounter = new Counter();
+  let channelMessageCounter = new Counter();
+  let guildMessageCounter = new Counter();
 
-  const channelIndex = await root.file("messages/index.json", "json");
+  const channelNames = await root
+    .file("messages/index.json")
+    .then(res => res.json())
+    .then(res => new Map(Object.entries(res)));
+  const guildNames = new Map();
+
   for await (const channelDir of await root.dir("messages")) {
     if (channelDir.isDirectory) {
+      const channel = await channelDir.file("channel.json").then(file => file.json());
+      if (!channelNames.has(channel.id)) channelNames.set(channel.id, channel.name);
+      if (channel.guild) guildNames.set(channel.guild.id, channel.guild.name);
+
       /** @type {AsyncGenerator<import("../util/types").Message>} */
       const messages = await channelDir
         .file("messages.csv")
@@ -52,52 +66,53 @@ export async function extractMessages({
 
         for (const word of getWords(message.Contents)) {
           totalWords++;
-          if (!wordCounts.has(word)) wordCounts.set(word, 0);
-          wordCounts.set(word, wordCounts.get(word) + 1);
+          wordCounter.incr(word);
         }
 
         for (const customEmoji of getCustomEmojis(message.Contents)) {
           totalCustomEmojis++;
-          if (!emojiCounts.has(customEmoji)) emojiCounts.set(customEmoji, 0);
-          emojiCounts.set(customEmoji, emojiCounts.get(customEmoji) + 1);
+          emojiCounter.incr(customEmoji);
         }
 
         for (const defaultEmoji of getDefaultEmojis(message.Contents)) {
           totalDefaultEmojis++;
-          if (!emojiCounts.has(defaultEmoji)) emojiCounts.set(defaultEmoji, 0);
-          emojiCounts.set(defaultEmoji, emojiCounts.get(defaultEmoji) + 1);
+          emojiCounter.incr(defaultEmoji);
         }
+
+        if (channel.type === ChannelTypes.DM || channel.type === ChannelTypes.GROUP_DM)
+          dmMessageCounter.incr(channel.id);
+        else channelMessageCounter.incr(channel.id);
+        if (channel.guild) guildMessageCounter.incr(channel.guild.id);
 
         const date = dayjs(message.Timestamp);
         if (!oldestMessage || date.isBefore(oldestMessage.date))
-          oldestMessage = { date, message, channelDir };
+          oldestMessage = {
+            date,
+            message,
+            guild_id: channel.guild?.id,
+            channel_id: channel.id
+          };
         if (!newestDate || date.isAfter(newestDate)) newestDate = date;
 
-        const hourlyKey = date.hour();
-        if (!hourlyValues.has(hourlyKey)) hourlyValues.set(hourlyKey, 0);
-        hourlyValues.set(hourlyKey, hourlyValues.get(hourlyKey) + 1);
-
-        const monthlyKey = date.format("YYYY-MM");
-        if (!monthlyValues.has(monthlyKey)) monthlyValues.set(monthlyKey, 0);
-        monthlyValues.set(monthlyKey, monthlyValues.get(monthlyKey) + 1);
+        hourlyCounter.incr(date.hour());
+        monthlyCounter.incr(date.format("YYYY-MM"));
       }
     }
   }
 
-  const oldestChannel = await oldestMessage.channelDir
-    .file("channel.json")
-    .then(file => file.json());
-
-  oldestMessage.guild_id = oldestChannel.guild?.id;
-  oldestMessage.channel_id = oldestChannel.id;
-  oldestMessage.channel_name = oldestChannel.name ?? channelIndex[oldestChannel.id];
-
   const totalDays = newestDate.diff(oldestMessage.date, "days");
   const averageDailyMessages = Math.round(totalMessages / totalDays);
 
+  const topWords = wordCounter.sort().slice(0, 25);
+  const topEmojis = emojiCounter.sort().slice(0, 25);
+
+  const topDms = dmMessageCounter.sort().slice(0, 100);
+  const topChannels = channelMessageCounter.sort().slice(0, 100);
+  const topGuilds = guildMessageCounter.sort().slice(0, 100);
+
   let hourlyLabels = [];
   let hourlyData = [];
-  for (const [hour, count] of hourlyValues.entries()) {
+  for (const [hour, count] of hourlyCounter) {
     hourlyLabels.push(dayjs().hour(hour).format("h A"));
     hourlyData.push(count);
   }
@@ -109,9 +124,6 @@ export async function extractMessages({
     currentDate = currentDate.add(1, "month")
   )
     monthlyLabels.push(currentDate.format("YYYY-MM"));
-
-  const topWords = [...wordCounts].sort((a, b) => b[1] - a[1]).slice(0, 25);
-  const topEmojis = [...emojiCounts].sort((a, b) => b[1] - a[1]).slice(0, 25);
 
   return {
     Messages: () => (
@@ -151,7 +163,7 @@ export async function extractMessages({
           Your first message was{" "}
           <b>
             <a
-              href={getMessageLink(
+              href={getMessageUrl(
                 oldestMessage.guild_id,
                 oldestMessage.channel_id,
                 oldestMessage.message.ID
@@ -161,7 +173,7 @@ export async function extractMessages({
             </a>
           </b>{" "}
           on <b>{oldestMessage.date.format(SHORT_DATE_TIME)}</b> in{" "}
-          <b>{oldestMessage.channel_name ?? "Unknown"}</b>
+          <b>{channelNames.get(oldestMessage.channel_id) ?? "Unknown"}</b>
         </div>
       </Tile>
     ),
@@ -199,6 +211,57 @@ export async function extractMessages({
         </table>
       </Tile>
     ),
+    TopDms: () => (
+      <Tile>
+        <h1>Top {topDms.length} DMs</h1>
+        <table>
+          <tbody>
+            {topDms.map(([dmId, count], index) => (
+              <tr>
+                <td>
+                  {index + 1}. {channelNames.get(dmId)}
+                </td>
+                <td className="end">{formatNum(count)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Tile>
+    ),
+    TopChannels: () => (
+      <Tile>
+        <h1>Top {topChannels.length} Channels</h1>
+        <table>
+          <tbody>
+            {topChannels.map(([channelId, count], index) => (
+              <tr>
+                <td>
+                  {index + 1}. {channelNames.get(channelId)}
+                </td>
+                <td className="end">{formatNum(count)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Tile>
+    ),
+    TopGuilds: () => (
+      <Tile>
+        <h1>Top {topGuilds.length} Guilds</h1>
+        <table>
+          <tbody>
+            {topGuilds.map(([guildId, count], index) => (
+              <tr>
+                <td>
+                  {index + 1}. {guildNames.get(guildId)}
+                </td>
+                <td className="end">{formatNum(count)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Tile>
+    ),
     MessagesPerMonth: () => (
       <Tile>
         <Chart
@@ -208,7 +271,7 @@ export async function extractMessages({
             labels: monthlyLabels,
             datasets: [
               {
-                data: monthlyLabels.map(label => monthlyValues.get(label)),
+                data: monthlyLabels.map(label => monthlyCounter.get(label)),
                 backgroundColor: BLURPLE
               }
             ]
