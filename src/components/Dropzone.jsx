@@ -11,6 +11,8 @@ export function Dropzone({ extract }) {
       }}
       ondragenter={({ target }) => target.classList.add("dropzone-active")}
       ondragleave={({ target }) => target.classList.remove("dropzone-active")}
-    ></div>
+    >
+      Drag files here!
+    </div>
   );
 }
