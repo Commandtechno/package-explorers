@@ -40,20 +40,20 @@ export async function extractMessages({
   let guildMessageCounter = new Counter();
 
   const channelNames = await root
-    .file("messages/index.json")
+    .getFile("messages/index.json")
     .then(res => res.json())
     .then(res => new Map(Object.entries(res)));
   const guildNames = new Map();
 
-  for await (const channelDir of await root.dir("messages")) {
+  for await (const channelDir of await root.getDir("messages")) {
     if (channelDir.isDirectory) {
-      const channel = await channelDir.file("channel.json").then(file => file.json());
+      const channel = await channelDir.getFile("channel.json").then(file => file.json());
       if (!channelNames.has(channel.id)) channelNames.set(channel.id, channel.name);
       if (channel.guild) guildNames.set(channel.guild.id, channel.guild.name);
 
       /** @type {AsyncGenerator<import("../util/types").Message>} */
       const messages = await channelDir
-        .file("messages.csv")
+        .getFile("messages.csv")
         .then(file => file.csv({ withHeaders: true }));
 
       for await (const message of messages) {

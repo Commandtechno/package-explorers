@@ -1,6 +1,7 @@
+import { $ } from "@common/util/helpers";
 import { Dropzone } from "./Dropzone";
 
-const root = document.getElementById("root");
+const root = $("root");
 
 export function ServiceCard(service) {
   return (

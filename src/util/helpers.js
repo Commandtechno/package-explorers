@@ -2,6 +2,10 @@ import { STOP_WORDS } from "../constants/STOP_WORDS";
 
 const WORD_REGEX = /(?<=\s|^)\w+(?=\s|$)/g;
 
+export function $(id) {
+  return document.getElementById(id);
+}
+
 export function rangeArray(start, end) {
   if (!end) {
     end = start;

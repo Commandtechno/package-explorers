@@ -16,9 +16,9 @@ function formatDiscriminator(discriminator) {
 
 /** @param {{ root: CustomDirectory }} */
 export async function extractAccount({ root }) {
-  const accountDir = await root.dir("account");
+  const accountDir = await root.getDir("account");
   /** @type {import("../util/types").Account} */
-  const user = await accountDir.file("user.json").then(file => file.json());
+  const user = await accountDir.getFile("user.json").then(file => file.json());
   const avatar = await accountDir.findFile(name => /^avatar\..*$/.test(name));
   const avatarUrl = URL.createObjectURL(await avatar.file());
 

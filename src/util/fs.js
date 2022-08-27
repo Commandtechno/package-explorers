@@ -112,14 +112,14 @@ export class CustomDirectory {
   }
 
   /** @return {Promise<CustomDirectory>} */
-  dir(name) {
+  getDir(name) {
     return new Promise((resolve, reject) =>
       this.entry.getDirectory(name, {}, dir => resolve(new CustomDirectory(dir)), reject)
     );
   }
 
   /** @return {Promise<CustomFile>} */
-  file(name) {
+  getFile(name) {
     return new Promise((resolve, reject) =>
       this.entry.getFile(name, {}, entry => resolve(new CustomFile(entry)), reject)
     );

@@ -8,9 +8,9 @@ import { getSnowflakeTimestamp } from "../helpers";
 
 /** @param {{ root: CustomDirectory }} */
 export async function extractActivity({ root }) {
-  const analyticsDir = await root.dir("activity/analytics");
+  const analyticsDir = await root.getDir("activity/analytics");
   const createdAt = await root
-    .file("account/user.json")
+    .getFile("account/user.json")
     .then(file => file.json())
     .then(user => getSnowflakeTimestamp(user.id));
 
