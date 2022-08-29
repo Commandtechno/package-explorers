@@ -26,17 +26,26 @@ export function Dropzone({ extract }) {
           className="dropzone-input"
           type="file"
           multiple
+          directory
+          webkitdirectory
           onchange={async function () {
-            const uz = new Unzip();
-            uz.register(AsyncUnzipInflate);
-            uz.onfile = console.log;
+            console.log(this.files);
 
-            const zip = this.files[0].stream().getReader();
-            while (true) {
-              const { value, done } = await zip.read();
-              if (done) break;
-              uz.push(value);
-            }
+            // const uz = new Unzip();
+            // uz.register(AsyncUnzipInflate);
+            // uz.onfile = file => {
+            //   file.start();
+            //   file.ondata = (err, data) => {
+            //     console.log(err, data);
+            //   };
+            // };
+
+            // const zip = this.files[0].stream().getReader();
+            // while (true) {
+            //   const { value, done } = await zip.read();
+            //   if (done) break;
+            //   uz.push(value);
+            // }
           }}
         />
         Drop files here!
