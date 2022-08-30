@@ -5,7 +5,7 @@ import { BLURPLE } from "../constants/COLORS";
 import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
 import { ChannelTypes } from "../enums/ChannelTypes";
 import { Counter } from "@common/util/counter";
-import { CustomDirectory } from "@common/util/fs";
+import { JSDirectory } from "@common/util/fs";
 import { formatNum, getWords, rangeArray } from "@common/util/helpers";
 import {
   getCustomEmojis,
@@ -15,7 +15,7 @@ import {
   getMessageUrl
 } from "../helpers";
 
-/** @param {{ root: CustomDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
+/** @param {{ root: JSDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
 export async function extractMessages({
   root,
   totalReactions,

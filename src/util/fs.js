@@ -4,20 +4,20 @@ export async function readNextEntriesAsync(reader) {
   return await new Promise((resolve, reject) => reader.readEntries(resolve, reject));
 }
 
-/** @return {CustomDirectory[]} */
+/** @return {JSDirectory[]} */
 export async function readDir(dir) {
   const entries = [];
   for await (const entry of dir) entries.push(entry);
   return entries;
 }
 
-/** @return {CustomDirectory} */
+/** @return {JSDirectory} */
 export async function detectSubfolder(dir) {
   const entries = await readDir(dir);
   return entries.length === 1 && entries[0].isDirectory ? entries[0] : dir;
 }
 
-export class CustomFile {
+export class JSFile {
   /** @type {FileSystemFileEntry} */
   entry;
 
@@ -93,7 +93,7 @@ export class CustomFile {
   }
 }
 
-export class CustomDirectory {
+export class JSDirectory {
   /** @type {FileSystemDirectoryEntry} */
   entry;
 
@@ -111,17 +111,17 @@ export class CustomDirectory {
     return this.entry.name;
   }
 
-  /** @return {Promise<CustomDirectory>} */
+  /** @return {Promise<JSDirectory>} */
   getDir(name) {
     return new Promise((resolve, reject) =>
-      this.entry.getDirectory(name, {}, dir => resolve(new CustomDirectory(dir)), reject)
+      this.entry.getDirectory(name, {}, dir => resolve(new JSDirectory(dir)), reject)
     );
   }
 
-  /** @return {Promise<CustomFile>} */
+  /** @return {Promise<JSFile>} */
   getFile(name) {
     return new Promise((resolve, reject) =>
-      this.entry.getFile(name, {}, entry => resolve(new CustomFile(entry)), reject)
+      this.entry.getFile(name, {}, entry => resolve(new JSFile(entry)), reject)
     );
   }
 
@@ -133,18 +133,14 @@ export class CustomDirectory {
     for await (const entry of this) if (entry.isFile && fn(entry.name)) return entry;
   }
 
-  /** @return {AsyncGenerator<CustomDirectory | CustomFile, undefined, undefined>} */
+  /** @return {AsyncGenerator<JSDirectory | JSFile, undefined, undefined>} */
   async *[Symbol.asyncIterator]() {
     const reader = this.entry.createReader();
     while (true) {
       const entries = await readNextEntriesAsync(reader);
       if (entries.length === 0) break;
       for (const entry of entries)
-        yield entry.isDirectory
-          ? new CustomDirectory(entry)
-          : entry.isFile
-          ? new CustomFile(entry)
-          : entry;
+        yield entry.isDirectory ? new JSDirectory(entry) : entry.isFile ? new JSFile(entry) : entry;
     }
   }
 }

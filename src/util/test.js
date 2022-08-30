@@ -1,5 +1,6 @@
 import { DecodeUTF8 } from "fflate";
 import { Reader } from "gocsv";
+import { parseCsv, parseJson } from "./parsers";
 
 export class JSFile {
   /** @type {FileSystemFileEntry} */
@@ -76,33 +77,11 @@ export class File {
   }
 
   async json() {
-    return await this.text().then(text => JSON.parse(text));
+    return await parseJson(await this.text());
   }
 
-  /** @returns {AsyncGenerator<Record<string, string>>} */
-  async *csv({ withHeaders }) {
-    const reader = new Reader(this.stream());
-
-    // extract headers
-    const headers = withHeaders && (await new Promise(resolve => reader.readN(1, resolve)));
-    const columns = withHeaders && headers.length;
-
-    // https://github.com/pckhoi/gocsv/blob/main/src/reader.ts#L352
-    // not using the built in method because its hard to do async generators
-    do {
-      await reader.r.fill();
-      while (true) {
-        const record = reader._readRecord();
-        if (record.length === 0) break;
-        if (withHeaders) {
-          const obj = {};
-          for (let i = 0; i < columns; i++) obj[headers[i]] = record[i];
-          yield obj;
-        } else {
-          yield record;
-        }
-      }
-    } while (!reader.r.eof);
+  async *csv(options) {
+    return await parseCsv(this.stream(), options);
   }
 }
 
@@ -119,20 +98,27 @@ export class ZipFile {
     const file = this.file;
     return new ReadableStream({
       start(controller) {
-        file.start();
         file.ondata = (err, chunk, final) => {
           if (err) writable.abort(err.message);
           controller.enqueue(chunk);
           if (final) controller.close();
         };
+
+        file.start();
       }
     });
   }
 
+  async blob() {
+    return await new Response(this.stream()).blob();
+  }
+
+  async url() {
+    return URL.createObjectURL(await this.blob());
+  }
+
   /** @return {Promise<string>} */
   async text() {
-    this.stream().blob;
-
     let text = "";
     return new Promise((resolve, reject) => {
       const decoder = new DecodeUTF8((chunk, final) => {
@@ -148,17 +134,41 @@ export class ZipFile {
       this.file.start();
     });
   }
+
+  async json() {
+    return await this.text().then(text => JSON.parse(text));
+  }
 }
 
-export class Folder {
-  /** @type {FileList} */
-  files;
+export class ZipDirectory {
+  entries = new Map();
 
+  // /** @param {import("fflate").UnzipFile[]} files */
   constructor(files) {
-    this.files = files;
+    // files.forEach(file => {});
   }
 
-  *[Symbol.iterator]() {
-    for (let i = 0; i < this.files.length; i++) yield this.files.item(i);
+  /** @param {import("fflate").UnzipFile} file */
+  createFile(file) {
+    let parentDir = this;
+    console.log(file.name);
+    if (file.name.endsWith("/")) {
+      file.name
+        .slice(0, -1)
+        .split("/")
+        .forEach(childDirName => {
+          if (!parentDir.entries.has(childDirName))
+            parentDir.entries.set(childDirName, new ZipDirectory());
+          parentDir = parentDir.entries.get(childDirName);
+        });
+    } else {
+      const parts = file.name.split("/");
+      const name = parts.pop();
+      parts.forEach(childDirName => {
+        parentDir = parentDir.entries.get(childDirName);
+      });
+
+      parentDir.entries.set(name, file);
+    }
   }
 }

@@ -1,12 +1,12 @@
 import dayjs from "dayjs";
 
-import { CustomDirectory } from "@common/util/fs";
+import { JSDirectory } from "@common/util/fs";
 import { Tile } from "@common/components/Tile";
 import { formatNum } from "@common/util/helpers";
 
 import { getSnowflakeTimestamp } from "../helpers";
 
-/** @param {{ root: CustomDirectory }} */
+/** @param {{ root: JSDirectory }} */
 export async function extractActivity({ root }) {
   const analyticsDir = await root.getDir("activity/analytics");
   const createdAt = await root

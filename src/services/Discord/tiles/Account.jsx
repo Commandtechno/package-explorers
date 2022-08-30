@@ -4,7 +4,7 @@ import { Chart } from "@common/components/Chart";
 import { Field } from "@common/components/Field";
 import { Tile } from "@common/components/Tile";
 import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
-import { CustomDirectory } from "@common/util/fs";
+import { JSDirectory } from "@common/util/fs";
 import { formatNum, formatCurrency } from "@common/util/helpers";
 
 import { BLURPLE } from "../constants/COLORS";
@@ -14,7 +14,7 @@ function formatDiscriminator(discriminator) {
   return "#" + discriminator.toString().padStart(4, "0");
 }
 
-/** @param {{ root: CustomDirectory }} */
+/** @param {{ root: JSDirectory }} */
 export async function extractAccount({ root }) {
   const accountDir = await root.getDir("account");
   /** @type {import("../util/types").Account} */
