@@ -29,7 +29,7 @@ export default {
       totalMessagesDeleted
     });
 
-    return () => (
+    return (
       <>
         <Row>
           <Account />

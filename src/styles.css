@@ -25,7 +25,7 @@ body {
   font-size: 16px;
 }
 
-#root {
+#app {
   width: 100%;
   height: 100%;
   padding: 20px;
@@ -53,15 +53,6 @@ body {
   justify-content: center;
   font-size: 100px;
   text-align: center;
-}
-
-.dropzone-input {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
   cursor: pointer;
 }
 
@@ -82,6 +73,12 @@ body {
 .service-card {
   cursor: pointer;
   border-radius: 10px;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .row {

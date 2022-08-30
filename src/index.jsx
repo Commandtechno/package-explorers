@@ -1,12 +1,14 @@
+import "./__dayjs";
+import "./__env";
 import "./__jsx";
 
 import { ServiceCard } from "./components/ServiceCard";
 import services from "./services";
 import { $ } from "./util/helpers";
 
-const root = $("root");
+const app = $("app");
 
-root.appendChild(
+app.replaceChildren(
   <div className="service-card-list">
     {services.map(service => (
       <ServiceCard {...service} />

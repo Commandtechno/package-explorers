@@ -1,7 +1,7 @@
 import { $ } from "@common/util/helpers";
 import { Dropzone } from "./Dropzone";
 
-const root = $("root");
+const app = $("app");
 
 export function ServiceCard(service) {
   return (
@@ -9,7 +9,7 @@ export function ServiceCard(service) {
       className="service-card"
       src={service.banner}
       alt={service.name}
-      onclick={() => root.replaceChildren(<Dropzone {...service} />)}
+      onclick={() => app.replaceChildren(<Dropzone {...service} />)}
     />
   );
 }

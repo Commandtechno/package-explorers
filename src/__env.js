@@ -1,0 +1,1 @@
+window.__ENV = new URL(location).searchParams.get("env");
