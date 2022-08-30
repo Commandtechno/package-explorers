@@ -1,5 +1,6 @@
 import { CustomDirectory } from "@common/util/fs";
 import { $ } from "@common/util/helpers";
+import { File } from "@common/util/test";
 import { AsyncUnzipInflate, Unzip } from "fflate";
 
 export function Dropzone({ extract }) {
@@ -29,23 +30,41 @@ export function Dropzone({ extract }) {
           directory
           webkitdirectory
           onchange={async function () {
-            console.log(this.files);
-
-            // const uz = new Unzip();
-            // uz.register(AsyncUnzipInflate);
-            // uz.onfile = file => {
-            //   file.start();
-            //   file.ondata = (err, data) => {
-            //     console.log(err, data);
-            //   };
-            // };
-
-            // const zip = this.files[0].stream().getReader();
-            // while (true) {
-            //   const { value, done } = await zip.read();
-            //   if (done) break;
-            //   uz.push(value);
+            // for (let i = 0; i < this.files.length; i++) {
+            //   const file = this.files.item(i);
             // }
+            // console.log(this.files);
+
+            console.log("a");
+            const files = [];
+            const uz = new Unzip();
+            uz.register(AsyncUnzipInflate);
+            uz.onfile = file => {
+              const stream = new ReadableStream({
+                start(controller) {
+                  console.log("starting");
+                  file.start();
+                  file.ondata = (err, chunk, final) => {
+                    if (err) writable.abort(err.message);
+                    controller.enqueue(chunk);
+                    if (final) controller.close();
+                  };
+                }
+              });
+
+              files.push(new Response(stream).blob().then(blob => new File(file.name, blob)));
+            };
+
+            console.log("b");
+            const zip = this.files[0].stream().getReader();
+            while (true) {
+              console.log("c");
+              const { value, done } = await zip.read();
+              if (done) break;
+              uz.push(value);
+            }
+
+            console.log(files);
           }}
         />
         Drop files here!
