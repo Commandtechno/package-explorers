@@ -161,15 +161,30 @@ table {
   border-spacing: 0px;
 }
 
-table .end {
+/* table .end {
   text-align: right;
-}
+} */
 
 tr > * {
   padding: 5px;
-  border-radius: 5px;
+}
+
+/* dont ask */
+
+td:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+td:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 tr:nth-child(odd) {
   background: var(--background-tertiary);
+}
+
+td:last-child {
+  text-align: right;
 }

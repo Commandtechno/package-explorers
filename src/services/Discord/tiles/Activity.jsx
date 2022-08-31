@@ -5,6 +5,7 @@ import { Tile } from "@common/components/Tile";
 import { formatNum } from "@common/util/helpers";
 
 import { getSnowflakeTimestamp } from "../helpers";
+import { readline } from "@common/util/readline";
 
 /** @param {{ root: JSDirectory }} */
 export async function extractActivity({ root }) {
@@ -62,18 +63,13 @@ export async function extractActivity({ root }) {
       // slash_command_used: 141
     };
   else {
-    let currentLine = "";
-    const chunks = await analyticsDir.findFile(name => /^events.*$/.test(name));
-    for await (const chunk of chunks)
-      chunk.split("\n").forEach(line => {
-        try {
-          const event = JSON.parse(currentLine + line);
-          if (events.hasOwnProperty(event.event_type)) events[event.event_type]++;
-          currentLine = "";
-        } catch {
-          currentLine = line;
-        }
-      });
+    const eventsFile = await analyticsDir.findFile(name => /^events.*$/.test(name));
+    const eventsStream = await eventsFile.stream();
+
+    for await (const line of readline(eventsStream.getReader())) {
+      const event = JSON.parse(line);
+      if (events.hasOwnProperty(event.event_type)) events[event.event_type]++;
+    }
   }
 
   const totalDays = dayjs().diff(createdAt, "days");

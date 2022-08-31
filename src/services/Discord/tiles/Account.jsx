@@ -20,7 +20,7 @@ export async function extractAccount({ root }) {
   /** @type {import("../util/types").Account} */
   const user = await accountDir.getFile("user.json").then(file => file.json());
   const avatar = await accountDir.findFile(name => /^avatar\..*$/.test(name));
-  const avatarUrl = URL.createObjectURL(await avatar.file());
+  const avatarUrl = await avatar.url();
 
   const created = getSnowflakeTimestamp(user.id);
   const moneySpent = formatCurrency(

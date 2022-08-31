@@ -1,6 +1,5 @@
-import { JSDirectory, detectSubfolder, JSFile } from "@common/util/fs";
+import { JSDirectory, detectSubfolder, JSFile, BaseDirectory, ZipDirectory } from "@common/util/fs";
 import { $ } from "@common/util/helpers";
-import { ZipDirectory } from "@common/util/test";
 import { AsyncUnzipInflate, Unzip } from "fflate";
 
 const app = $("app");
@@ -12,14 +11,17 @@ export function Dropzone({ extract }) {
         id="dropzone"
         className="dropzone"
         ondrop={async function (ev) {
+          console.log("drop");
           ev.preventDefault();
           this.classList.remove("dropzone-active");
 
-          const [item] = ev.dataTransfer.items;
-          const entry = item.webkitGetAsEntry();
-          if (item.type === "application/zip") {
+          /** @type {BaseDirectory} */
+          let root;
+
+          const entry = ev.dataTransfer.items[0].webkitGetAsEntry();
+          if (entry.isFile && entry.name.endsWith(".zip")) {
             const uz = new Unzip();
-            const dir = new ZipDirectory();
+            const dir = new ZipDirectory(entry.name.replace(".zip", ""));
             uz.register(AsyncUnzipInflate);
             uz.onfile = file => dir.createFile(file);
 
@@ -31,14 +33,20 @@ export function Dropzone({ extract }) {
               uz.push(value);
             }
 
-            console.log(dir);
+            root = dir;
+          } else if (entry.isDirectory) {
+            root = await detectSubfolder(new JSDirectory(entry.filesystem.root));
+          } else {
+            throw new Error("Invalid file type");
           }
-          const fs = entry.filesystem.root;
-          const root = await detectSubfolder(new JSDirectory(fs));
 
-          // await extract({ root })
-          //   .then(res => app.replaceChildren(<div className="result">{res}</div>))
-          //   .catch(err => (document.body.innerText = err.message));
+          console.log(root);
+          await extract({ root })
+            .then(res => app.replaceChildren(<div className="result">{res}</div>))
+            .catch(err => {
+              console.error(err);
+              document.body.innerText = err.message;
+            });
         }}
         ondragenter={function () {
           this.classList.add("dropzone-active");
