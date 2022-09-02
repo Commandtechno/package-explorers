@@ -1,14 +1,16 @@
+import { BaseDirectory } from "@common/util/fs/BaseDirectory.js";
+import { Row } from "@common/components/Row";
+
 import { extractMessages } from "./tiles/Messages.jsx";
 import { extractAccount } from "./tiles/Account";
 import { extractActivity } from "./tiles/Activity";
-import { Row } from "@common/components/Row";
 
 import banner from "./banner.svg";
 
 export default {
   name: "Discord",
   banner,
-  /** @param {{ root: CustomDirectory }} */
+  /** @param {{ root: BaseDirectory }} */
   async extract({ root }) {
     const { Account, Flags, Connections, TopGames } = await extractAccount({ root });
     const { totalReactions, totalMessagesEdited, totalMessagesDeleted, Analytics } =

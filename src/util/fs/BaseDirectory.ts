@@ -1,6 +1,6 @@
 import { BaseFile } from "./BaseFile";
 
-export abstract class BaseDirectory<File extends BaseFile> {
+export abstract class BaseDirectory<File extends BaseFile = BaseFile> {
   isFile: false = false;
   isDirectory: true = true;
 

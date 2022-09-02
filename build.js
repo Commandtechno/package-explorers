@@ -1,8 +1,8 @@
-import esbuild from "esbuild";
+const esbuild = require("esbuild");
 
 const dev = process.argv[2] === "dev";
 
-await esbuild.build({
+esbuild.build({
   entryPoints: ["./src/index.html", "./src/styles.css", "./src/index.jsx"],
   outdir: "./build",
   jsxFactory: "__jsx",
