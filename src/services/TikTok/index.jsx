@@ -12,11 +12,10 @@ export default {
   async extract({ root }) {
     const userData = await root.getFile("user_data.json").then(res => res.json());
     console.log(userData);
-    const Activity = await extractActivity({ userData });
-    return (
-      <Row>
-        <Activity />
-      </Row>
-    );
+    const { Activity, VideosPerMonth } = await extractActivity({ userData });
+    return <Row>
+      <Activity />
+      <VideosPerMonth />
+    </Row>
   }
 };

@@ -31,32 +31,30 @@ export default {
       totalMessagesDeleted
     });
 
-    return (
-      <>
-        <Row>
-          <Account />
-          <Flags />
-          <Connections />
-        </Row>
-        <Row>
-          <Analytics />
-          <Messages />
-        </Row>
-        <Row>
-          <TopWords />
-          <TopGames />
-          <TopEmojis />
-        </Row>
-        <Row>
-          <TopDms />
-          <TopChannels />
-          <TopGuilds />
-        </Row>
-        <Row>
-          <MessagesPerMonth />
-          <MessagesPerHour />
-        </Row>
-      </>
-    );
+    return <>
+      <Row>
+        <Account />
+        <Flags />
+        <Connections />
+      </Row>
+      <Row>
+        <Analytics />
+        <Messages />
+      </Row>
+      <Row>
+        <TopWords />
+        <TopGames />
+        <TopEmojis />
+      </Row>
+      <Row>
+        <TopDms />
+        <TopChannels />
+        <TopGuilds />
+      </Row>
+      <Row>
+        <MessagesPerMonth />
+        <MessagesPerHour />
+      </Row>
+    </>
   }
 };

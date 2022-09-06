@@ -30,7 +30,7 @@ export async function extractMessages({
   let totalCustomEmojis = 0;
   let totalDefaultEmojis = 0;
   let oldestMessage;
-  let newestDate;
+  let newestMessageDate;
   let hourlyCounter = new Counter(rangeArray(24).map(i => [i, 0]));
   let monthlyCounter = new Counter();
   let wordCounter = new Counter();
@@ -90,7 +90,7 @@ export async function extractMessages({
             guild_id: channel.guild?.id,
             channel_id: channel.id
           };
-        if (!newestDate || date.isAfter(newestDate)) newestDate = date;
+        if (!newestMessageDate || date.isAfter(newestMessageDate)) newestMessageDate = date;
 
         hourlyCounter.incr(date.hour());
         monthlyCounter.incr(date.format("YYYY-MM"));
@@ -98,7 +98,7 @@ export async function extractMessages({
     }
   }
 
-  const totalDays = newestDate.diff(oldestMessage.date, "days");
+  const totalDays = newestMessageDate.diff(oldestMessage.date, "days");
   const averageDailyMessages = Math.round(totalMessages / totalDays);
 
   const topWords = wordCounter.sort().slice(0, 25);
@@ -118,149 +118,102 @@ export async function extractMessages({
   let monthlyLabels = [];
   for (
     let currentDate = oldestMessage.date.clone();
-    currentDate.isBefore(newestDate);
+    currentDate.isBefore(newestMessageDate);
     currentDate = currentDate.add(1, "month")
   )
     monthlyLabels.push(currentDate.format("YYYY-MM"));
 
   return {
-    Messages: () => (
+    Messages: () =>
       <Tile>
         <h1>Messages</h1>
-        <div>
-          You've sent <b>{formatNum(totalMessages)}</b> total messages in your{" "}
-          <b>{formatNum(totalDays)}</b> days here.
+        <div>You've sent <b>{formatNum(totalMessages)}</b> total messages in your <b>{formatNum(totalDays)}</b> days here.</div>
+        <div>That's an average of <b>{formatNum(averageDailyMessages)}</b> messages a day.</div>
+        <div>That's a total of <b>{formatNum(totalWords)}</b> words.</div>
+        <div>That's a total of <b>{formatNum(totalCharacters)}</b> characters.</div>
+        <div>Text wasn't enough? You sent <b>{formatNum(totalAttachments)}</b> files.</div>
+        <div>Like emojis? You used <b>{formatNum(totalCustomEmojis)}</b> custom emojis and <b>{formatNum(totalDefaultEmojis)}</b> default emojis.</div>
+        <div>Overall, you pinged <b>{formatNum(totalMentions)}</b> users, roles, and channels</div>
+        <div>Whoops, you edited <b>{formatNum(totalMessagesEdited)}</b> messages and deleted <b>{formatNum(totalMessagesDeleted)}</b> messages.</div>
+        <div>You added <b>{formatNum(totalReactions)}</b> reactions to messages.</div>
+        <div>Your first message was <b><a href={getMessageUrl(
+          oldestMessage.guild_id,
+          oldestMessage.channel_id,
+          oldestMessage.message.ID
+        )}>{oldestMessage.message.Contents}</a></b> on <b>{oldestMessage.date.format(SHORT_DATE_TIME)}</b> in <b>{channelNames.get(oldestMessage.channel_id) ?? "Unknown"}</b>
         </div>
-        <div>
-          That's an average of <b>{formatNum(averageDailyMessages)}</b> messages a day.
-        </div>
-        <div>
-          That's a total of <b>{formatNum(totalWords)}</b> words.
-        </div>
-        <div>
-          That's a total of <b>{formatNum(totalCharacters)}</b> characters.
-        </div>
-        <div>
-          Text wasn't enough? You sent <b>{formatNum(totalAttachments)}</b> files.
-        </div>
-        <div>
-          Like emojis? You used <b>{formatNum(totalCustomEmojis)}</b> custom emojis and{" "}
-          <b>{formatNum(totalDefaultEmojis)}</b> default emojis.
-        </div>
-        <div>
-          Overall, you pinged <b>{formatNum(totalMentions)}</b> users, roles, and channels
-        </div>
-        <div>
-          Whoops, you edited <b>{formatNum(totalMessagesEdited)}</b> messages and deleted{" "}
-          <b>{formatNum(totalMessagesDeleted)}</b> messages.
-        </div>
-        <div>
-          You added <b>{formatNum(totalReactions)}</b> reactions to messages.
-        </div>
-        <div>
-          Your first message was{" "}
-          <b>
-            <a
-              href={getMessageUrl(
-                oldestMessage.guild_id,
-                oldestMessage.channel_id,
-                oldestMessage.message.ID
-              )}
-            >
-              {oldestMessage.message.Contents}
-            </a>
-          </b>{" "}
-          on <b>{oldestMessage.date.format(SHORT_DATE_TIME)}</b> in{" "}
-          <b>{channelNames.get(oldestMessage.channel_id) ?? "Unknown"}</b>
-        </div>
-      </Tile>
-    ),
-    TopWords: () => (
+      </Tile>,
+    TopWords: () =>
       <Tile>
         <h1>Top {topWords.length} words</h1>
         <table>
           <tbody>
             {topWords.map(([word, count], index) => (
               <tr>
-                <td>
-                  {index + 1}. {word}
-                </td>
-                <td className="end">{formatNum(count)}</td>
+                <td>{index + 1}. {word}</td>
+                <td>{formatNum(count)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </Tile>
-    ),
-    TopEmojis: () => (
+      </Tile>,
+    TopEmojis: () =>
       <Tile>
         <h1>Top {topEmojis.length} emojis</h1>
         <table>
           <tbody>
             {topEmojis.map(([emoji, count], index) => (
               <tr>
-                <td>
-                  {index + 1}. <img className="emoji" src={getEmojiUrl(emoji)} />
-                </td>
-                <td className="end">{formatNum(count)}</td>
+                <td>{index + 1}. <img className="emoji" src={getEmojiUrl(emoji)} /></td>
+                <td>{formatNum(count)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </Tile>
-    ),
-    TopDms: () => (
+      </Tile>,
+    TopDms: () =>
       <Tile>
         <h1>Top {topDms.length} DMs</h1>
         <table>
           <tbody>
             {topDms.map(([dmId, count], index) => (
               <tr>
-                <td>
-                  {index + 1}. {channelNames.get(dmId)}
-                </td>
-                <td className="end">{formatNum(count)}</td>
+                <td>{index + 1}. {channelNames.get(dmId)}</td>
+                <td>{formatNum(count)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </Tile>
-    ),
-    TopChannels: () => (
+      </Tile>,
+    TopChannels: () =>
       <Tile>
         <h1>Top {topChannels.length} Channels</h1>
         <table>
           <tbody>
             {topChannels.map(([channelId, count], index) => (
               <tr>
-                <td>
-                  {index + 1}. {channelNames.get(channelId)}
-                </td>
-                <td className="end">{formatNum(count)}</td>
+                <td>{index + 1}. {channelNames.get(channelId)}</td>
+                <td>{formatNum(count)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </Tile>
-    ),
-    TopGuilds: () => (
+      </Tile>,
+    TopGuilds: () =>
       <Tile>
         <h1>Top {topGuilds.length} Guilds</h1>
         <table>
           <tbody>
             {topGuilds.map(([guildId, count], index) => (
               <tr>
-                <td>
-                  {index + 1}. {guildNames.get(guildId)}
-                </td>
-                <td className="end">{formatNum(count)}</td>
+                <td>{index + 1}. {guildNames.get(guildId)}</td>
+                <td>{formatNum(count)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </Tile>
-    ),
-    MessagesPerMonth: () => (
+      </Tile>,
+    MessagesPerMonth: () =>
       <Tile>
         <Chart
           type="bar"
@@ -275,9 +228,8 @@ export async function extractMessages({
             ]
           }}
         />
-      </Tile>
-    ),
-    MessagesPerHour: () => (
+      </Tile>,
+    MessagesPerHour: () =>
       <Tile>
         <Chart
           type="bar"
@@ -288,6 +240,5 @@ export async function extractMessages({
           }}
         />
       </Tile>
-    )
   };
 }

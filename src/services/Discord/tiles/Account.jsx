@@ -24,10 +24,7 @@ export async function extractAccount({ root }) {
 
   const created = getSnowflakeTimestamp(user.id);
   const moneySpent = formatCurrency(
-    user.payments.reduce(
-      (total, { amount, amount_refunded }) => total + amount - amount_refunded,
-      0
-    ) / 100,
+    user.payments.reduce((total, { amount, amount_refunded }) => total + amount - amount_refunded, 0) / 100,
     user.payments[0]?.currency
   );
 
@@ -37,20 +34,17 @@ export async function extractAccount({ root }) {
 
   if (__ENV !== "dev")
     for (const game of topGames)
-      game.application_name = await fetch(
-        `https://discord.com/api/v10/applications/${game.application_id}/rpc`
-      )
+      game.application_name = await fetch(`https://discord.com/api/v10/applications/${game.application_id}/rpc`)
         .then(res => res.json())
         .then(res => res.name)
-        .catch(() => {});
+        .catch(() => { });
 
   return {
-    Account: () => (
+    Account: () =>
       <Tile>
         <h1>
           <img className="account-avatar" src={avatarUrl} alt="Avatar" />
-          {user.username}
-          <span className="account-discriminator">{formatDiscriminator(user.discriminator)}</span>
+          {user.username} <span className="account-discriminator">{formatDiscriminator(user.discriminator)}</span>
         </h1>
         <div className="field-group">
           <Field label="id" value={user.id} />
@@ -61,19 +55,15 @@ export async function extractAccount({ root }) {
           <Field label="friends" value={formatNum(user.relationships.length)} />
           <Field label="money spent" value={moneySpent} />
         </div>
-      </Tile>
-    ),
-    Flags: () => (
+      </Tile>,
+    Flags: () =>
       <Tile size={2}>
         <h1>Flags</h1>
         <div className="field-group">
-          {extractUserFlags(user.flags).map(({ flag, description }) => (
-            <Field label={flag} value={description} />
-          ))}
+          {extractUserFlags(user.flags).map(({ flag, description }) => <Field label={flag} value={description} />)}
         </div>
-      </Tile>
-    ),
-    Connections: () => (
+      </Tile>,
+    Connections: () =>
       <Tile>
         <h1>Connections</h1>
         <div className="field-group">
@@ -81,9 +71,8 @@ export async function extractAccount({ root }) {
             <Field label={type} value={name} />
           ))}
         </div>
-      </Tile>
-    ),
-    TopGames: () => (
+      </Tile>,
+    TopGames: () =>
       <Tile size={2}>
         <Chart
           type="bar"
@@ -104,6 +93,5 @@ export async function extractAccount({ root }) {
           }}
         />
       </Tile>
-    )
   };
 }

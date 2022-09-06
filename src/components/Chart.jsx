@@ -1,8 +1,8 @@
 const GRID_COLOR = "rgba(255,255,255,0.1)";
 
-import { Chart as ChartJS, BarElement, LinearScale, CategoryScale, BarController } from "chart.js";
+import { Chart as ChartJS, registerables } from "chart.js";
 
-ChartJS.register(BarElement, LinearScale, CategoryScale, BarController);
+ChartJS.register(...registerables);
 
 /** @param {import("chart.js").ChartConfiguration & { title: string }} props */
 export function Chart(props) {
@@ -35,6 +35,8 @@ export function Chart(props) {
       }
     }
   };
+
+  console.log(JSON.parse(JSON.stringify(props)));
 
   const canvas = <canvas />;
   new ChartJS(canvas, props);

@@ -11,6 +11,7 @@ esbuild.build({
     ".html": "copy",
     ".svg": "file"
   },
+  format: "esm",
   bundle: true,
   minify: !dev,
   watch: dev && {

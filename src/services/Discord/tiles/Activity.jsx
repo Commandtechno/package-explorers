@@ -80,51 +80,18 @@ export async function extractActivity({ root }) {
     totalReactions: events.add_reaction,
     totalMessagesEdited: events.message_edited,
     totalMessagesDeleted: events.message_deleted,
-    Analytics: () => (
+    Analytics: () =>
       <Tile>
         <h1>Analytics</h1>
-        <div>
-          Your status was updated <b>{formatNum(events.activity_updated)}</b> times.
-        </div>
-        <div>
-          Are you a robot? You were served <b>{formatNum(events.captcha_served)}</b> captchas and
-          solved <b>{formatNum(events.captcha_solved)}</b> of them.
-        </div>
-        <div>
-          Overall, you viewed <b>{formatNum(events.guild_viewed)}</b> servers and opened{" "}
-          <b>{formatNum(events.channel_opened)}</b> channels.
-        </div>
-        <div>
-          That's an average of <b>{formatNum(averageDailyGuilds)}</b> guilds and{" "}
-          <b>{formatNum(averageDailyChannels)}</b> channels a day.
-        </div>
-        <div>
-          Ring ring, you joined <b>{formatNum(events.join_call + events.join_voice_channel)}</b>{" "}
-          calls and voice channels.
-        </div>
-        <div>
-          Fast typer? You used <b>{formatNum(events.keyboard_shortcut_used)}</b> keyboard shortcuts.
-        </div>
-        <div>
-          Discord detected <b>{formatNum(events.launch_game)}</b> game launches.
-        </div>
-        <div>
-          In total, you edited <b>{formatNum(events.message_edited)}</b> messages and deleted{" "}
-          <b>{formatNum(events.message_deleted)}</b> of them.
-        </div>
-        <div>
-          You opened the quick switcher <b>{formatNum(events.quickswitcher_opened)}</b> times.
-        </div>
-        {/* <div>
-          You searched <b>{formatNum(events.search_started)}</b> times.
-        </div>
-        <div>
-          You joined <b>{formatNum(events.join_thread)}</b> threads.
-        </div>
-        <div>
-          You used <b>{formatNum(events.slash_command_used)}</b> slash commands.
-        </div> */}
+        <div>Your status was updated <b>{formatNum(events.activity_updated)}</b> times.</div>
+        <div>Are you a robot? You were served <b>{formatNum(events.captcha_served)}</b> captchas and solved <b>{formatNum(events.captcha_solved)}</b> of them.</div>
+        <div>Overall, you viewed <b>{formatNum(events.guild_viewed)}</b> servers and opened <b>{formatNum(events.channel_opened)}</b> channels.</div>
+        <div>That's an average of <b>{formatNum(averageDailyGuilds)}</b> guilds and <b>{formatNum(averageDailyChannels)}</b> channels a day.</div>
+        <div>Ring ring, you joined <b>{formatNum(events.join_call + events.join_voice_channel)}</b> calls and voice channels.</div>
+        <div>Fast typer? You used <b>{formatNum(events.keyboard_shortcut_used)}</b> keyboard shortcuts.</div>
+        <div>Discord detected <b>{formatNum(events.launch_game)}</b> game launches.</div>
+        <div>In total, you edited <b>{formatNum(events.message_edited)}</b> messages and deleted <b>{formatNum(events.message_deleted)}</b> of them.</div>
+        <div>You opened the quick switcher <b>{formatNum(events.quickswitcher_opened)}</b> times.</div>
       </Tile>
-    )
   };
 }
