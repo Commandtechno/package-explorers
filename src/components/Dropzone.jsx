@@ -1,10 +1,13 @@
 import { JSDirectory, detectSubfolder, JSFile, BaseDirectory, ZipDirectory } from "@common/util/fs";
 import { $ } from "@common/util/helpers";
 import { AsyncUnzipInflate, Unzip } from "fflate";
+import { Spinner } from "./Spinner";
 
 const app = $("app");
 
 export function Dropzone({ extract }) {
+
+
   return (
     <div className="dropzone-container">
       <div
@@ -14,6 +17,7 @@ export function Dropzone({ extract }) {
           console.log("drop");
           ev.preventDefault();
           this.classList.remove("dropzone-active");
+          this.parentElement.replaceChild(<Spinner />, this);
 
           /** @type {BaseDirectory} */
           let root;

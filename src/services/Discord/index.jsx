@@ -42,19 +42,19 @@ export default {
         <Messages />
       </Row>
       <Row>
-        <TopWords />
-        <TopGames />
-        <TopEmojis />
-      </Row>
-      <Row>
         <TopDms />
         <TopChannels />
         <TopGuilds />
       </Row>
       <Row>
+        <TopWords />
+        <TopGames />
+        <TopEmojis />
+      </Row>
+      <Row>
         <MessagesPerMonth />
         <MessagesPerHour />
       </Row>
-    </>
+    </>;
   }
 };

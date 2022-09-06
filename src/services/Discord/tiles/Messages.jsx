@@ -216,13 +216,14 @@ export async function extractMessages({
     MessagesPerMonth: () =>
       <Tile>
         <Chart
-          type="bar"
+          type="line"
           title="Messages per month"
           data={{
             labels: monthlyLabels,
             datasets: [
               {
                 data: monthlyLabels.map(label => monthlyCounter.get(label)),
+                borderColor: BLURPLE,
                 backgroundColor: BLURPLE
               }
             ]
@@ -232,11 +233,15 @@ export async function extractMessages({
     MessagesPerHour: () =>
       <Tile>
         <Chart
-          type="bar"
+          type="line"
           title="Messages per hour"
           data={{
             labels: hourlyLabels,
-            datasets: [{ data: hourlyData, backgroundColor: BLURPLE }]
+            datasets: [{
+              data: hourlyData,
+              borderColor: BLURPLE,
+              backgroundColor: BLURPLE
+            }]
           }}
         />
       </Tile>

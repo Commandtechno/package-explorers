@@ -10,27 +10,32 @@ export async function extractActivity({ userData }) {
   const likedList = userData["Activity"]["Like List"]["ItemFavoriteList"];
   const favoriteVideoList = userData["Activity"]["Favorite Videos"]["FavoriteVideoList"];
 
-  let oldestVideoDate
-  let newestVideoDate
+  let oldestVideoDate;
+  let newestVideoDate;
   let monthlyCounter = new Counter();
+  let videoCounter = new Counter();
 
   for (const video of videoList) {
-    const date = dayjs(video.Date)
-    monthlyCounter.incr(date.format("YYYY-MM"))
+    videoCounter.incr(video.VideoLink);
+
+    const date = dayjs(video.Date);
+    monthlyCounter.incr(date.format("YYYY-MM"));
 
     if (!oldestVideoDate || date.isBefore(oldestVideoDate))
-      oldestVideoDate = date
+      oldestVideoDate = date;
     if (!newestVideoDate || date.isAfter(newestVideoDate))
-      newestVideoDate = date
+      newestVideoDate = date;
   }
 
-  let monthlyLabels = []
+  let monthlyLabels = [];
   for (
     let currentDate = oldestVideoDate.clone();
     currentDate.isBefore(newestVideoDate);
     currentDate = currentDate.add(1, "month")
   )
     monthlyLabels.push(currentDate.format("YYYY-MM"));
+
+  const topVideos = videoCounter.sort().slice(0, 25);
 
   return {
     Activity: () =>
@@ -42,18 +47,32 @@ export async function extractActivity({ userData }) {
     VideosPerMonth: () =>
       <Tile>
         <Chart
-          type="bar"
-          title="Videos per month"
+          type="line"
+          title="Videos watched per month"
           data={{
             labels: monthlyLabels,
             datasets: [
               {
                 data: monthlyLabels.map(label => monthlyCounter.get(label) ?? 0),
+                borderColor: BLURPLE,
                 backgroundColor: BLURPLE
               }
             ]
           }}
         />
       </Tile>,
+    TopVideos: () =>
+      <Tile>
+        <h1>Top {topVideos.length} most watched videos</h1>
+        <table>
+          <td>
+            <tr>
+              <th>Video</th>
+              <th>Times Watched</th>
+            </tr>
+
+          </td>
+        </table>
+      </Tile>
   };
 }

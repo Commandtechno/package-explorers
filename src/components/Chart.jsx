@@ -36,8 +36,6 @@ export function Chart(props) {
     }
   };
 
-  console.log(JSON.parse(JSON.stringify(props)));
-
   const canvas = <canvas />;
   new ChartJS(canvas, props);
   return canvas;
