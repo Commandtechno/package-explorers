@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
 import { Chart } from "@common/components/Chart";
-import { Field } from "@common/components/Field";
+import { Field, FieldGroup } from "@common/components/Field";
 import { Tile } from "@common/components/Tile";
 import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
 import { BaseDirectory } from "@common/util/fs";
@@ -37,7 +37,7 @@ export async function extractAccount({ root }) {
       game.application_name = await fetch(`https://discord.com/api/v10/applications/${game.application_id}/rpc`)
         .then(res => res.json())
         .then(res => res.name)
-        .catch(() => { });
+        .catch(() => {});
 
   return {
     Account: () =>
@@ -46,7 +46,7 @@ export async function extractAccount({ root }) {
           <img className="account-avatar" src={avatarUrl} alt="Avatar" />
           {user.username} <span className="account-discriminator">{formatDiscriminator(user.discriminator)}</span>
         </h1>
-        <div className="field-group">
+        <FieldGroup>
           <Field label="id" value={user.id} />
           <Field label="email" value={user.email} />
           <Field label="phone" value={user.phone} />
@@ -54,23 +54,23 @@ export async function extractAccount({ root }) {
           <Field label="ip address" value={user.ip} />
           <Field label="friends" value={formatNum(user.relationships.length)} />
           <Field label="money spent" value={moneySpent} />
-        </div>
+        </FieldGroup>
       </Tile>,
     Flags: () =>
       <Tile size={2}>
         <h1>Flags</h1>
-        <div className="field-group">
+        <FieldGroup>
           {extractUserFlags(user.flags).map(({ flag, description }) => <Field label={flag} value={description} />)}
-        </div>
+        </FieldGroup>
       </Tile>,
     Connections: () =>
       <Tile>
         <h1>Connections</h1>
-        <div className="field-group">
+        <FieldGroup>
           {user.connections.map(({ type, name }) => (
             <Field label={type} value={name} />
           ))}
-        </div>
+        </FieldGroup>
       </Tile>,
     TopGames: () =>
       <Tile size={2}>

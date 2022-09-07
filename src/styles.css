@@ -158,6 +158,10 @@ tr:nth-child(odd) {
   background: var(--background-tertiary);
 }
 
+td:first-child {
+  text-align: left;
+}
+
 td:last-child {
   text-align: right;
 }

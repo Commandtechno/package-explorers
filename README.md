@@ -11,6 +11,6 @@ My motivation for making this is my interest in data and privacy and being curio
 # epic checklist
 
 - [x] Discord
-- [ ] TikTok
+- [x] TikTok
 - [ ] Spotify
 - [ ] Google

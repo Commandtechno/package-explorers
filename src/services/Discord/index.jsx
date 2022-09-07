@@ -42,14 +42,14 @@ export default {
         <Messages />
       </Row>
       <Row>
-        <TopDms />
-        <TopChannels />
-        <TopGuilds />
-      </Row>
-      <Row>
         <TopWords />
         <TopGames />
         <TopEmojis />
+      </Row>
+      <Row>
+        <TopDms />
+        <TopChannels />
+        <TopGuilds />
       </Row>
       <Row>
         <MessagesPerMonth />

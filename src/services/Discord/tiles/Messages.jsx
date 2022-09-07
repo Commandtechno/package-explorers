@@ -6,7 +6,7 @@ import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
 import { ChannelTypes } from "../enums/ChannelTypes";
 import { Counter } from "@common/util/counter";
 import { BaseDirectory } from "@common/util/fs";
-import { formatNum, getWords, rangeArray } from "@common/util/helpers";
+import { formatHour, formatNum, getWords, rangeNum, rangeDate } from "@common/util/helpers";
 import {
   getCustomEmojis,
   getDefaultEmojis,
@@ -14,6 +14,7 @@ import {
   getMentionCount,
   getMessageUrl
 } from "../helpers";
+import { Link } from "@common/components/Link";
 
 /** @param {{ root: BaseDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
 export async function extractMessages({
@@ -31,8 +32,8 @@ export async function extractMessages({
   let totalDefaultEmojis = 0;
   let oldestMessage;
   let newestMessageDate;
-  let hourlyCounter = new Counter(rangeArray(24).map(i => [i, 0]));
-  let monthlyCounter = new Counter();
+  let hourlyMessageCounter = new Counter(rangeNum(24, i => [i, 0]));
+  let monthlyMessageCounter = new Counter();
   let wordCounter = new Counter();
   let emojiCounter = new Counter();
   let dmMessageCounter = new Counter();
@@ -77,8 +78,7 @@ export async function extractMessages({
           emojiCounter.incr(defaultEmoji);
         }
 
-        if (channel.type === ChannelTypes.DM || channel.type === ChannelTypes.GROUP_DM)
-          dmMessageCounter.incr(channel.id);
+        if (channel.type === ChannelTypes.DM || channel.type === ChannelTypes.GROUP_DM) dmMessageCounter.incr(channel.id);
         else channelMessageCounter.incr(channel.id);
         if (channel.guild) guildMessageCounter.incr(channel.guild.id);
 
@@ -92,8 +92,8 @@ export async function extractMessages({
           };
         if (!newestMessageDate || date.isAfter(newestMessageDate)) newestMessageDate = date;
 
-        hourlyCounter.incr(date.hour());
-        monthlyCounter.incr(date.format("YYYY-MM"));
+        hourlyMessageCounter.incr(date.hour());
+        monthlyMessageCounter.incr(date.format("YYYY-MM"));
       }
     }
   }
@@ -108,20 +108,8 @@ export async function extractMessages({
   const topChannels = channelMessageCounter.sort().slice(0, 100);
   const topGuilds = guildMessageCounter.sort().slice(0, 100);
 
-  let hourlyLabels = [];
-  let hourlyData = [];
-  for (const [hour, count] of hourlyCounter) {
-    hourlyLabels.push(dayjs().hour(hour).format("h A"));
-    hourlyData.push(count);
-  }
-
-  let monthlyLabels = [];
-  for (
-    let currentDate = oldestMessage.date.clone();
-    currentDate.isBefore(newestMessageDate);
-    currentDate = currentDate.add(1, "month")
-  )
-    monthlyLabels.push(currentDate.format("YYYY-MM"));
+  const hourlyMessageLabels = hourlyMessageCounter.map(([hour]) => hour);
+  const monthlyMessageLabels = rangeDate(oldestMessage.date, newestMessageDate, "month").map(date => date.format("YYYY-MM"));
 
   return {
     Messages: () =>
@@ -136,11 +124,11 @@ export async function extractMessages({
         <div>Overall, you pinged <b>{formatNum(totalMentions)}</b> users, roles, and channels</div>
         <div>Whoops, you edited <b>{formatNum(totalMessagesEdited)}</b> messages and deleted <b>{formatNum(totalMessagesDeleted)}</b> messages.</div>
         <div>You added <b>{formatNum(totalReactions)}</b> reactions to messages.</div>
-        <div>Your first message was <b><a href={getMessageUrl(
+        <div>Your first message was <b><Link href={getMessageUrl(
           oldestMessage.guild_id,
           oldestMessage.channel_id,
           oldestMessage.message.ID
-        )}>{oldestMessage.message.Contents}</a></b> on <b>{oldestMessage.date.format(SHORT_DATE_TIME)}</b> in <b>{channelNames.get(oldestMessage.channel_id) ?? "Unknown"}</b>
+        )}>{oldestMessage.message.Contents}</Link></b> on <b>{oldestMessage.date.format(SHORT_DATE_TIME)}</b> in <b>{channelNames.get(oldestMessage.channel_id) ?? "Unknown"}</b>
         </div>
       </Tile>,
     TopWords: () =>
@@ -178,7 +166,7 @@ export async function extractMessages({
           <tbody>
             {topDms.map(([dmId, count], index) => (
               <tr>
-                <td>{index + 1}. {channelNames.get(dmId)}</td>
+                <td>{index + 1}. {channelNames.get(dmId) ?? 'Unknown'}</td>
                 <td>{formatNum(count)}</td>
               </tr>
             ))}
@@ -187,12 +175,12 @@ export async function extractMessages({
       </Tile>,
     TopChannels: () =>
       <Tile>
-        <h1>Top {topChannels.length} Channels</h1>
+        <h1>Top {topChannels.length} channels</h1>
         <table>
           <tbody>
             {topChannels.map(([channelId, count], index) => (
               <tr>
-                <td>{index + 1}. {channelNames.get(channelId)}</td>
+                <td>{index + 1}. {channelNames.get(channelId) ?? 'Unknown'}</td>
                 <td>{formatNum(count)}</td>
               </tr>
             ))}
@@ -201,7 +189,7 @@ export async function extractMessages({
       </Tile>,
     TopGuilds: () =>
       <Tile>
-        <h1>Top {topGuilds.length} Guilds</h1>
+        <h1>Top {topGuilds.length} guilds</h1>
         <table>
           <tbody>
             {topGuilds.map(([guildId, count], index) => (
@@ -219,10 +207,10 @@ export async function extractMessages({
           type="line"
           title="Messages per month"
           data={{
-            labels: monthlyLabels,
+            labels: monthlyMessageLabels,
             datasets: [
               {
-                data: monthlyLabels.map(label => monthlyCounter.get(label)),
+                data: monthlyMessageLabels.map(label => monthlyMessageCounter.get(label)),
                 borderColor: BLURPLE,
                 backgroundColor: BLURPLE
               }
@@ -236,12 +224,15 @@ export async function extractMessages({
           type="line"
           title="Messages per hour"
           data={{
-            labels: hourlyLabels,
+            labels: hourlyMessageLabels,
             datasets: [{
-              data: hourlyData,
+              data: hourlyMessageLabels.map(hour => hourlyMessageCounter.get(hour)),
               borderColor: BLURPLE,
               backgroundColor: BLURPLE
             }]
+          }}
+          options={{
+            scales: { x: { ticks: { callback: formatHour } } }
           }}
         />
       </Tile>

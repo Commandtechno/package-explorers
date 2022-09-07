@@ -29,4 +29,4 @@ export function __fragment() {
   return document.createDocumentFragment();
 }
 
-Object.assign(window, { __jsx, __fragment });
+Object.assign(window, {__jsx, __fragment});

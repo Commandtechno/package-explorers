@@ -1,3 +1,7 @@
+export function FieldGroup() {
+  return <div className="field-group"></div>;
+}
+
 export function Field({ label, value }) {
   return (
     <div className="field">
