@@ -5,8 +5,8 @@ import dayjs from "dayjs";
 
 export async function extractProfile({ userData }) {
   const profile = userData["Profile"]['Profile Information']['ProfileMap'];
-  const followingList = userData["Following List"]?.["FollowingList"] ?? [];
-  const followerList = userData["Follower List"]?.["FollowerList"] ?? [];
+  const followingList = userData['Activity']["Following List"]?.["Following"] ?? [];
+  const followerList = userData['Activity']["Follower List"]?.["Follower"] ?? [];
 
   return {
     Profile: () =>
