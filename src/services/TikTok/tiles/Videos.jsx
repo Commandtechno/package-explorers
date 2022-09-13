@@ -3,7 +3,7 @@ import { Link } from "@common/components/Link";
 import { Tile } from "@common/components/Tile";
 import { BLURPLE } from "@common/services/Discord/constants/COLORS";
 import { Counter } from "@common/util/counter";
-import { rangeDate, rangeNum } from "@common/util/helpers";
+import { formatHour, rangeDate, rangeNum } from "@common/util/helpers";
 import dayjs from "dayjs";
 
 export async function extractVideos({ userData }) {
@@ -26,7 +26,6 @@ export async function extractVideos({ userData }) {
     if (!newestVideoDate || date.isAfter(newestVideoDate)) newestVideoDate = date;
   }
 
-  const hourlyLabels = hourlyVideoCounter.map(([hour]) => hour);
   const monthlyLabels = rangeDate(oldestVideoDate, newestVideoDate, "month").map(date => date.format("YYYY-MM"));
 
   const topVideos = __ENV === 'dev'
@@ -38,7 +37,7 @@ export async function extractVideos({ userData }) {
 
       const meta = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`)
         .then(res => res.json())
-        .catch(() => {});
+        .catch(() => { });
 
       return [{ url, meta }, count];
     }));
@@ -67,10 +66,10 @@ export async function extractVideos({ userData }) {
           type="line"
           title="Videos watched per hour"
           data={{
-            labels: hourlyLabels,
+            labels: hourlyVideoCounter.map(([hour]) => formatHour(hour)),
             datasets: [
               {
-                data: hourlyLabels.map(label => hourlyVideoCounter.get(label)),
+                data: hourlyVideoCounter.map(([hour]) => hourlyVideoCounter.get(hour)),
                 borderColor: BLURPLE,
                 backgroundColor: BLURPLE
               }

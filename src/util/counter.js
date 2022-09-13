@@ -3,9 +3,9 @@ export class Counter extends Map {
     return super.get(key) ?? 0;
   }
 
-  incr(key) {
+  incr(key, n = 1) {
     let value = this.get(key);
-    this.set(key, value + 1);
+    this.set(key, value + n);
   }
 
   sort() {

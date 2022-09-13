@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {STOP_WORDS} from "../constants/STOP_WORDS";
+import { STOP_WORDS } from "../constants/STOP_WORDS";
 
 const WORD_REGEX = /(?<=\s|^)\w+(?=\s|$)/g;
 
@@ -13,7 +13,7 @@ export function rangeNum(start, end, fn = i => i) {
     start = 0;
   }
 
-  return Array.from({length: end - start}, (_, i) => fn(i + start));
+  return Array.from({ length: end - start }, (_, i) => fn(i + start));
 }
 
 /**
@@ -37,7 +37,7 @@ export function formatNum(num) {
 }
 
 export function formatCurrency(amount, currency) {
-  return amount.toLocaleString(undefined, {style: "currency", currency});
+  return amount.toLocaleString(undefined, { style: "currency", currency });
 }
 
 export function getWords(text) {
