@@ -44,7 +44,6 @@ export function Dropzone({ extract }) {
             throw new Error("Invalid file type");
           }
 
-          console.log(root);
           await extract({ root })
             .then(res => app.replaceChildren(<div className="result">{res}</div>))
             .catch(err => {

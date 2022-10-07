@@ -1,0 +1,16 @@
+.service-card-title {
+  text-align: center;
+}
+
+.service-card-list {
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  max-width: 1600px;
+  display: grid;
+  margin: 0 auto;
+}
+
+.service-card {
+  cursor: pointer;
+  border-radius: 10px;
+}

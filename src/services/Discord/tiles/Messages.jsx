@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import { Chart } from "@common/components/Chart";
 import { Tile } from "@common/components/Tile";
-import { BLURPLE } from "../constants/COLORS";
 import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
 import { ChannelTypes } from "../enums/ChannelTypes";
 import { Counter } from "@common/util/counter";
@@ -15,6 +14,7 @@ import {
   getMessageUrl
 } from "../helpers";
 import { Link } from "@common/components/Link";
+import { accentColor } from "..";
 
 /** @param {{ root: BaseDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
 export async function extractMessages({
@@ -108,7 +108,6 @@ export async function extractMessages({
   const topChannels = channelMessageCounter.sort().slice(0, 100);
   const topGuilds = guildMessageCounter.sort().slice(0, 100);
 
-  const hourlyMessageLabels = hourlyMessageCounter.map(([hour]) => hour);
   const monthlyMessageLabels = rangeDate(oldestMessage.date, newestMessageDate, "month").map(date => date.format("YYYY-MM"));
 
   return {
@@ -152,7 +151,7 @@ export async function extractMessages({
           <tbody>
             {topEmojis.map(([emoji, count], index) => (
               <tr>
-                <td>{index + 1}. <img className="emoji" src={getEmojiUrl(emoji)} /></td>
+                <td>{index + 1}. <img className="discord-emoji" src={getEmojiUrl(emoji)} /></td>
                 <td>{formatNum(count)}</td>
               </tr>
             ))}
@@ -211,8 +210,8 @@ export async function extractMessages({
             datasets: [
               {
                 data: monthlyMessageLabels.map(label => monthlyMessageCounter.get(label)),
-                borderColor: BLURPLE,
-                backgroundColor: BLURPLE
+                borderColor: accentColor,
+                backgroundColor: accentColor
               }
             ]
           }}
@@ -224,15 +223,17 @@ export async function extractMessages({
           type="line"
           title="Messages per hour"
           data={{
-            labels: hourlyMessageLabels,
+            labels: hourlyMessageCounter.keys(),
             datasets: [{
-              data: hourlyMessageLabels.map(hour => hourlyMessageCounter.get(hour)),
-              borderColor: BLURPLE,
-              backgroundColor: BLURPLE
+              data: hourlyMessageCounter.values(),
+              borderColor: accentColor,
+              backgroundColor: accentColor
             }]
           }}
           options={{
-            scales: { x: { ticks: { callback: formatHour } } }
+            scales: {
+              x: { ticks: { callback: formatHour } }
+            }
           }}
         />
       </Tile>

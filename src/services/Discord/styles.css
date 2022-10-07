@@ -1,0 +1,17 @@
+.discord-emoji {
+  max-width: 24px;
+  max-height: 24px;
+  vertical-align: middle;
+}
+
+.discord-account-avatar {
+  width: 66px;
+  height: 66px;
+  vertical-align: middle;
+  margin-right: 12px;
+  border-radius: 33px;
+}
+
+.discord-account-discriminator {
+  color: var(--foreground-secondary);
+}

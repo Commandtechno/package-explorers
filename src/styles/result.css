@@ -1,0 +1,48 @@
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.row {
+  gap: 20px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tile {
+  width: 320px;
+  height: 320px;
+  padding: 20px;
+  background-color: var(--background-secondary);
+  border-radius: 10px;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.tile h1 {
+  margin-top: 0;
+  text-align: center;
+  font-size: 24px;
+}
+
+.tile b {
+  color: var(--foreground-accent);
+}
+
+.tile a {
+  text-underline-offset: 2px;
+}
+
+.tile-1 {
+  flex: 1 1 auto;
+}
+
+.tile-2 {
+  flex: 2 2 auto;
+}
+
+.tile-3 {
+  flex: 3 3 auto;
+}

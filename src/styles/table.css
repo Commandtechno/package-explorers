@@ -1,0 +1,36 @@
+table {
+  width: 100%;
+  border-spacing: 0px;
+}
+
+/* table .end {
+  text-align: right;
+} */
+
+tr > * {
+  padding: 5px;
+}
+
+/* dont ask */
+
+td:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+td:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+tr:nth-child(odd) {
+  background: var(--background-tertiary);
+}
+
+td:first-child {
+  text-align: left;
+}
+
+td:last-child {
+  text-align: right;
+}

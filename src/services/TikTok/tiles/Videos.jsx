@@ -1,10 +1,10 @@
 import { Chart } from "@common/components/Chart";
 import { Link } from "@common/components/Link";
 import { Tile } from "@common/components/Tile";
-import { BLURPLE } from "@common/services/Discord/constants/COLORS";
 import { Counter } from "@common/util/counter";
 import { formatHour, rangeDate, rangeNum } from "@common/util/helpers";
 import dayjs from "dayjs";
+import { accentColor } from "..";
 
 export async function extractVideos({ userData }) {
   const watchedVideoList = userData["Activity"]["Video Browsing History"]["VideoList"];
@@ -26,7 +26,7 @@ export async function extractVideos({ userData }) {
     if (!newestVideoDate || date.isAfter(newestVideoDate)) newestVideoDate = date;
   }
 
-  const monthlyLabels = rangeDate(oldestVideoDate, newestVideoDate, "month").map(date => date.format("YYYY-MM"));
+  const monthlyVideoLabels = rangeDate(oldestVideoDate, newestVideoDate, "month").map(date => date.format("YYYY-MM"));
 
   const topVideos = __ENV === 'dev'
     ? videoCounter.sort().slice(0, 25).map(([url, count]) => ([{ url }, count]))
@@ -49,12 +49,12 @@ export async function extractVideos({ userData }) {
           type="line"
           title="Videos watched per month"
           data={{
-            labels: monthlyLabels,
+            labels: monthlyVideoLabels,
             datasets: [
               {
-                data: monthlyLabels.map(label => monthlyVideoCounter.get(label)),
-                borderColor: BLURPLE,
-                backgroundColor: BLURPLE
+                data: monthlyVideoLabels.map(label => monthlyVideoCounter.get(label)),
+                borderColor: accentColor,
+                backgroundColor: accentColor
               }
             ]
           }}
@@ -66,14 +66,19 @@ export async function extractVideos({ userData }) {
           type="line"
           title="Videos watched per hour"
           data={{
-            labels: hourlyVideoCounter.map(([hour]) => formatHour(hour)),
+            labels: hourlyVideoCounter.keys(),
             datasets: [
               {
-                data: hourlyVideoCounter.map(([hour]) => hourlyVideoCounter.get(hour)),
-                borderColor: BLURPLE,
-                backgroundColor: BLURPLE
+                data: hourlyVideoCounter.values(),
+                borderColor: accentColor,
+                backgroundColor: accentColor
               }
             ]
+          }}
+          options={{
+            scales: {
+              x: { ticks: { callback: formatHour } },
+            }
           }}
         />
       </Tile>,

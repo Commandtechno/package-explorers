@@ -12,8 +12,12 @@ export class Counter extends Map {
     return [...this].sort((a, b) => b[1] - a[1]);
   }
 
-  map(fn) {
-    return [...this].map(fn);
+  keys(fn) {
+    return Array.from(super.keys(), fn)
+  }
+
+  values(fn) {
+    return Array.from(super.values(), fn)
   }
 
   [Symbol.iterator]() {

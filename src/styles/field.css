@@ -1,0 +1,13 @@
+.field-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.field-label {
+  color: var(--foreground-secondary);
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}

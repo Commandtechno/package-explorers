@@ -1,23 +1,23 @@
 import { Chart } from "@common/components/Chart";
 import { Tile } from "@common/components/Tile";
-import { BLURPLE } from "@common/services/Discord/constants/COLORS";
 import { Counter } from "@common/util/counter";
 import { BaseDirectory } from "@common/util/fs";
-import { formatHour, rangeNum } from "@common/util/helpers";
+import { formatHour, rangeDate, rangeNum } from "@common/util/helpers";
 import dayjs from "dayjs";
+import { accentColor } from "..";
 
 /** @param {{ root: BaseDirectory }} */
 export async function extractStreaming({ root }) {
-  let hourlyCounter = new Counter(rangeNum(24, i => [i, 0]));
-  let monthlyCounter = new Counter();
+  let hourlyListeningCounter = new Counter(rangeNum(24, i => [i, 0]));
+  let monthlyListeningCounter = new Counter();
   let trackCounter = new Counter();
   let artistCounter = new Counter();
 
   const streamingHistory = await root.getFile('StreamingHistory0.json').then(res => res.json())
   for (const track of streamingHistory) {
     const endTime = dayjs(track.endTime)
-    hourlyCounter.incr(endTime.hour(), track.msPlayed);
-    monthlyCounter.incr(endTime.format('YYYY-MM'), track.msPlayed);
+    hourlyListeningCounter.incr(endTime.hour(), track.msPlayed);
+    monthlyListeningCounter.incr(endTime.format('YYYY-MM'), track.msPlayed);
     if (track.trackName !== 'Unknown Track' && track.artistName !== 'Unknown Artist') {
       trackCounter.incr(track.trackName, track.msPlayed);
       artistCounter.incr(track.artistName, track.msPlayed);
@@ -27,7 +27,10 @@ export async function extractStreaming({ root }) {
   const topTracks = trackCounter.sort().slice(0, 25)
   const topArtists = artistCounter.sort().slice(0, 25)
 
-  const hourlyLabels = hourlyCounter.map(([hour]) => hour);
+  const monthlyListeningLabels = rangeDate(
+    dayjs(streamingHistory[0].endTime),
+    dayjs(streamingHistory[streamingHistory.length - 1].endTime), "month"
+  ).map(date => date.format("YYYY-MM"))
 
   return {
     TopTracks: () =>
@@ -56,47 +59,48 @@ export async function extractStreaming({ root }) {
           </tbody>
         </table>
       </Tile>,
+    ListeningPerMonth: () =>
+      <Tile>
+        <Chart
+          type="line"
+          title="Listening per month"
+          data={{
+            labels: monthlyListeningLabels,
+            datasets: [
+              {
+                data: monthlyListeningLabels.map(label => monthlyListeningCounter.get(label)),
+                borderColor: accentColor,
+                backgroundColor: accentColor
+              }
+            ]
+          }}
+          options={{
+            scales: {
+              y: { ticks: { callback: ms => dayjs.duration(ms, 'milliseconds').humanize() } }
+            }
+          }}
+        />
+      </Tile>,
     ListeningPerHour: () =>
       <Tile>
         <Chart
           type="line"
           title="Listening per hour"
           data={{
-            labels: hourlyLabels,
+            labels: hourlyListeningCounter.keys(),
             datasets: [{
-              data: hourlyLabels.map(hour => hourlyCounter.get(hour)),
-              borderColor: BLURPLE,
-              backgroundColor: BLURPLE
+              data: hourlyListeningCounter.values(),
+              borderColor: accentColor,
+              backgroundColor: accentColor
             }]
           }}
           options={{
             scales: {
               x: { ticks: { callback: formatHour } },
-              y: { ticks: { callback: label => dayjs.duration(label, 'milliseconds').humanize() } }
+              y: { ticks: { callback: ms => dayjs.duration(ms, 'milliseconds').humanize() } }
             }
           }}
         />
       </Tile>
-    // TopTracks: () =>
-    //   <Tile>
-    //     <Chart
-    //       type="bar"
-    //       title={`Top ${topTracks.length} tracks`}
-    //       data={{
-    //         labels: topTracks.map(([track]) => track),
-    //         datasets: [
-    //           {
-    //             data: topTracks.map(([, count]) => count),
-    //             backgroundColor: BLURPLE
-    //           }
-    //         ]
-    //       }}
-    //       options={{
-    //         scales: {
-    //           y: { ticks: { callback: label => dayjs.duration(label, 'milliseconds').humanize() } }
-    //         }
-    //       }}
-    //     />
-    //   </Tile>
   }
 }

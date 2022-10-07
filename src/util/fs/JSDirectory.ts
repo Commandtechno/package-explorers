@@ -10,7 +10,14 @@ export async function readNextEntriesAsync(reader: FileSystemDirectoryReader) {
 export async function detectSubfolder(dir: JSDirectory): Promise<JSDirectory> {
   const entries = [];
   for await (const entry of dir) entries.push(entry);
-  return entries.length === 1 && entries[0].isDirectory ? entries[0] : dir;
+  if (entries.length === 1) {
+    const [entry] = entries
+    if (!entry.isDirectory) return dir
+    if (!dir.name) return await detectSubfolder(entry)
+    return entry
+  }
+
+  return dir
 }
 
 export class JSDirectory extends BaseDirectory<JSFile> {

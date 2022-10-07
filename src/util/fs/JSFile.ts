@@ -20,8 +20,8 @@ export class JSFile extends BaseFile {
     return await this.file();
   }
 
-  /** @returns {Promise<ReadableStream<Uint8Array>>} */
-  async stream() {
+  async stream(): Promise<ReadableStream<Uint8Array>> {
+    // @ts-ignore
     return await this.file().then(file => file.stream());
   }
 

@@ -7,8 +7,8 @@ import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
 import { BaseDirectory } from "@common/util/fs";
 import { formatNum, formatCurrency } from "@common/util/helpers";
 
-import { BLURPLE } from "../constants/COLORS";
 import { getSnowflakeTimestamp, extractUserFlags } from "../helpers";
+import { accentColor } from "..";
 
 function formatDiscriminator(discriminator) {
   return "#" + discriminator.toString().padStart(4, "0");
@@ -37,14 +37,14 @@ export async function extractAccount({ root }) {
       game.application_name = await fetch(`https://discord.com/api/v10/applications/${game.application_id}/rpc`)
         .then(res => res.json())
         .then(res => res.name)
-        .catch(() => {});
+        .catch(() => { });
 
   return {
     Account: () =>
       <Tile>
         <h1>
-          <img className="account-avatar" src={avatarUrl} alt="Avatar" />
-          {user.username} <span className="account-discriminator">{formatDiscriminator(user.discriminator)}</span>
+          <img className="discord-account-avatar" src={avatarUrl} alt="Avatar" />
+          {user.username} <span className="discord-account-discriminator">{formatDiscriminator(user.discriminator)}</span>
         </h1>
         <FieldGroup>
           <Field label="id" value={user.id} />
@@ -82,7 +82,7 @@ export async function extractAccount({ root }) {
             datasets: [
               {
                 data: topGames.map(game => game.total_duration),
-                backgroundColor: BLURPLE
+                backgroundColor: accentColor
               }
             ]
           }}

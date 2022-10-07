@@ -9,7 +9,10 @@ export function ServiceCard(service) {
       className="service-card"
       src={service.banner}
       alt={service.name}
-      onclick={() => app.replaceChildren(<Dropzone {...service} />)}
+      onclick={() => {
+        app.style.setProperty('--foreground-accent', service.accentColor)
+        app.replaceChildren(<Dropzone {...service} />)
+      }}
     />
   );
 }

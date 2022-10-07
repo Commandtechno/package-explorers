@@ -22,6 +22,7 @@
   cursor: pointer;
 }
 
+.dropzone:hover,
 .dropzone-active {
   border-width: thick;
   border-style: dashed;
