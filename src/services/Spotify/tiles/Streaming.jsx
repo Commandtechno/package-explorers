@@ -1,13 +1,18 @@
+import dayjs from "dayjs";
+
 import { Chart } from "@common/components/Chart";
 import { Tile } from "@common/components/Tile";
 import { Counter } from "@common/util/counter";
 import { BaseDirectory } from "@common/util/fs";
-import { formatHour, rangeDate, rangeNum } from "@common/util/helpers";
-import dayjs from "dayjs";
+import { formatHour, formatNum, rangeDate, rangeNum } from "@common/util/helpers";
+
 import { accentColor } from "..";
+import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
+
 
 /** @param {{ root: BaseDirectory }} */
 export async function extractStreaming({ root }) {
+  let totalListeningTime = 0
   let hourlyListeningCounter = new Counter(rangeNum(24, i => [i, 0]));
   let monthlyListeningCounter = new Counter();
   let trackCounter = new Counter();
@@ -15,6 +20,7 @@ export async function extractStreaming({ root }) {
 
   const streamingHistory = await root.getFile('StreamingHistory0.json').then(res => res.json())
   for (const track of streamingHistory) {
+    totalListeningTime += track.msPlayed
     const endTime = dayjs(track.endTime)
     hourlyListeningCounter.incr(endTime.hour(), track.msPlayed);
     monthlyListeningCounter.incr(endTime.format('YYYY-MM'), track.msPlayed);
@@ -23,6 +29,9 @@ export async function extractStreaming({ root }) {
       artistCounter.incr(track.artistName, track.msPlayed);
     }
   }
+
+  const [firstTrack] = streamingHistory
+  const startTime = dayjs(firstTrack.endTime).subtract(dayjs.duration(firstTrack.msPlayed, 'milliseconds'))
 
   const topTracks = trackCounter.sort().slice(0, 25)
   const topArtists = artistCounter.sort().slice(0, 25)
@@ -33,6 +42,11 @@ export async function extractStreaming({ root }) {
   ).map(date => date.format("YYYY-MM"))
 
   return {
+    Streaming: () =>
+      <Tile size="2">
+        <h1>Streaming</h1>
+        <p>You've streamed a total of <b>{formatNum(Math.round(dayjs.duration(totalListeningTime, 'milliseconds').asMinutes()))}</b> minutes of music since <b>{startTime.format('MMMM YYYY')}</b></p>
+      </Tile>,
     TopTracks: () =>
       <Tile>
         <h1>Top {topTracks.length} tracks</h1>

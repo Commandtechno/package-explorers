@@ -1,6 +1,5 @@
 // https://www.ranks.nl/stopwords
 export const STOP_WORDS = new Set([
-  "",
   "a",
   "able",
   "about",

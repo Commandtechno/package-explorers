@@ -8,10 +8,11 @@ export { default as banner } from './banner.svg'
 
 /** @param {{ root: BaseDirectory }} */
 export async function extract({ root }) {
-  const { TopTracks, TopArtists, ListeningPerMonth, ListeningPerHour } = await extractStreaming({ root });
+  const { Streaming, TopTracks, TopArtists, ListeningPerMonth, ListeningPerHour } = await extractStreaming({ root });
   return <>
     <Row>
       <TopTracks />
+      <Streaming />
       <TopArtists />
     </Row>
     <Row>
