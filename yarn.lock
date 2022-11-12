@@ -272,7 +272,7 @@ esbuild-openbsd-64@0.15.13:
 
 "esbuild-plugin-html@https://github.com/Commandtechno/esbuild-plugin-html":
   version "1.0.0"
-  resolved "https://github.com/Commandtechno/esbuild-plugin-html#701ac4da35b8df53eb2b0010219473ed28ae5a9c"
+  resolved "https://github.com/Commandtechno/esbuild-plugin-html#c5e87f03e22255ab5b785f0f7da9ca23214cba39"
   dependencies:
     htmlnano "^2.0.2"
     posthtml "^0.16.6"
