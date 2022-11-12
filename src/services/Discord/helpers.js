@@ -3,7 +3,7 @@ import { parse } from "twemoji-parser";
 import dayjs from "dayjs";
 
 import TWEMOJI_REGEX from "twemoji-parser/dist/lib/regex";
-import { USER_FLAGS } from "./constants/USER_FLAGS";
+import { USER_FLAGS } from "./constants/USER_FLAGS.macro";
 
 const MENTION_REGEX = /\<(@|@!|#|@&)\d+\>/g;
 const GLOBAL_CUSTOM_EMOJI_REGEX = /<a?:\w+:\d+>/g;

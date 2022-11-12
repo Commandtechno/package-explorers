@@ -270,17 +270,17 @@ esbuild-openbsd-64@0.15.13:
   resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.15.13.tgz#45e8a5fd74d92ad8f732c43582369c7990f5a0ac"
   integrity sha512-nkuDlIjF/sfUhfx8SKq0+U+Fgx5K9JcPq1mUodnxI0x4kBdCv46rOGWbuJ6eof2n3wdoCLccOoJAbg9ba/bT2w==
 
-"esbuild-plugin-html@github:Commandtechno/esbuild-plugin-html":
+"esbuild-plugin-html@https://github.com/Commandtechno/esbuild-plugin-html":
   version "1.0.0"
-  resolved "https://codeload.github.com/Commandtechno/esbuild-plugin-html/tar.gz/701ac4da35b8df53eb2b0010219473ed28ae5a9c"
+  resolved "https://github.com/Commandtechno/esbuild-plugin-html#701ac4da35b8df53eb2b0010219473ed28ae5a9c"
   dependencies:
     htmlnano "^2.0.2"
     posthtml "^0.16.6"
     svgo "^2.8.0"
 
-"esbuild-plugin-macros@github:Commandtechno/esbuild-plugin-macros":
+"esbuild-plugin-macros@https://github.com/Commandtechno/esbuild-plugin-macros":
   version "1.0.0"
-  resolved "https://codeload.github.com/Commandtechno/esbuild-plugin-macros/tar.gz/b5d83aba24090da64a9dc69b3728177723306456"
+  resolved "https://github.com/Commandtechno/esbuild-plugin-macros#b5d83aba24090da64a9dc69b3728177723306456"
   dependencies:
     serialize-javascript "^6.0.0"
 
