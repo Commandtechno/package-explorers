@@ -1,20 +1,22 @@
-import dayjs from "dayjs";
-import { Chart } from "@common/components/Chart";
-import { Tile } from "@common/components/Tile";
-import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
-import { ChannelTypes } from "../enums/ChannelTypes";
-import { Counter } from "@common/util/counter";
-import { BaseDirectory } from "@common/util/fs";
-import { formatHour, formatNum, getWords, rangeNum, rangeDate } from "@common/util/helpers";
+import { formatHour, formatNum, getWords, rangeDate, rangeNum } from "@common/util/helpers";
 import {
+  getAttachmentCount,
   getCustomEmojis,
   getDefaultEmojis,
   getEmojiUrl,
   getMentionCount,
   getMessageUrl
 } from "../helpers";
+
+import { BaseDirectory } from "@common/util/fs";
+import { ChannelTypes } from "../enums/ChannelTypes";
+import { Chart } from "@common/components/Chart";
+import { Counter } from "@common/util/counter";
 import { Link } from "@common/components/Link";
+import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
+import { Tile } from "@common/components/Tile";
 import { accentColor } from "..";
+import dayjs from "dayjs";
 
 /** @param {{ root: BaseDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
 export async function extractMessages({
@@ -60,7 +62,7 @@ export async function extractMessages({
       for await (const message of messages) {
         totalMessages++;
         totalCharacters += message.Contents.length;
-        totalAttachments += message.Attachments.split(" ").length;
+        totalAttachments += getAttachmentCount(message.Attachments);
         totalMentions += getMentionCount(message.Contents);
 
         for (const word of getWords(message.Contents)) {
@@ -94,6 +96,8 @@ export async function extractMessages({
 
         hourlyMessageCounter.incr(date.hour());
         monthlyMessageCounter.incr(date.format("YYYY-MM"));
+        break
+
       }
     }
   }
