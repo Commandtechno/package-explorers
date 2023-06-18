@@ -4,16 +4,15 @@ const { resolve } = require('path');
 
 const esbuild = require("esbuild");
 const esbuildMacros = require("esbuild-plugin-macros");
-const esbuildHtml = require("esbuild-plugin-html");
 
 const dev = process.argv[2] === "dev";
 
 esbuild.build({
-  entryPoints: ["./src/index.html",],
+  entryPoints: ["./src/index.html", './src/index.jsx', './src/styles.css'],
   outdir: "./build",
   jsxFactory: "__jsx",
   jsxFragment: "__fragment",
-  loader: { ".svg": "file" },
+  loader: { ".svg": "file", '.html': 'copy' },
   format: "esm",
   bundle: true,
   minify: !dev,
@@ -23,7 +22,7 @@ esbuild.build({
       else console.log("watch build succeeded");
     }
   },
-  plugins: [esbuildMacros, esbuildHtml(), {
+  plugins: [esbuildMacros, {
     name: 'svg',
     setup(build) {
       build.onResolve({ filter: /\.svg$/ }, args => ({ path: resolve(args.resolveDir, args.path), namespace: 'svg' }));
