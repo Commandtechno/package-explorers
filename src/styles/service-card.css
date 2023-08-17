@@ -14,3 +14,18 @@
   cursor: pointer;
   border-radius: 10px;
 }
+
+.service-upload-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.instructions {
+  text-align: center;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}

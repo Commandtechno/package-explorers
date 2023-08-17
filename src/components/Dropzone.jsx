@@ -1,20 +1,19 @@
-import { JSDirectory, detectSubfolder, JSFile, BaseDirectory, ZipDirectory } from "@common/util/fs";
-import { $ } from "@common/util/helpers";
 import { AsyncUnzipInflate, Unzip } from "fflate";
+import { BaseDirectory, JSDirectory, JSFile, ZipDirectory, detectSubfolder } from "@common/util/fs";
+
+import { $ } from "@common/util/helpers";
 import { Spinner } from "./Spinner";
 
 const app = $("app");
 
 export function Dropzone({ extract }) {
-
-
   return (
     <div className="dropzone-container">
+      <input type="file" id="dropzone-file-input" className="dropzone-file-input" />
       <div
         id="dropzone"
         className="dropzone"
         ondrop={async function (ev) {
-          console.log("drop");
           ev.preventDefault();
           this.classList.remove("dropzone-active");
           this.parentElement.replaceChild(<Spinner />, this);
@@ -57,6 +56,7 @@ export function Dropzone({ extract }) {
         ondragleave={function () {
           this.classList.remove("dropzone-active");
         }}
+        onclick={() => $("dropzone-file-input").click()}
         ondragover={ev => ev.preventDefault()}
       >
         Drop files here!
