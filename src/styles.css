@@ -2,7 +2,7 @@
 
 @import url("./styles/dropzone.css");
 @import url("./styles/field.css");
-@import url("./styles/loading.css");
+@import url("./styles/spinner.css");
 @import url("./styles/result.css");
 @import url("./styles/service-card.css");
 @import url("./styles/table.css");
@@ -15,6 +15,10 @@
   --background-tertiary: rgb(24 28 32);
   --foreground-secondary: rgb(185, 187, 190);
   --foreground-primary: rgb(255, 255, 255);
+}
+
+* {
+  box-sizing: border-box;
 }
 
 html {
