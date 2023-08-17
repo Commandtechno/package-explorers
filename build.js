@@ -4,7 +4,6 @@ const { resolve } = require('path');
 
 const esbuild = require("esbuild");
 const esbuildMacros = require("esbuild-plugin-macros");
-const esbuildHtml = require("esbuild-plugin-html");
 
 const dev = process.argv[2] === "dev";
 

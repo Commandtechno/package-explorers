@@ -96,8 +96,6 @@ export async function extractMessages({
 
         hourlyMessageCounter.incr(date.hour());
         monthlyMessageCounter.incr(date.format("YYYY-MM"));
-        break
-
       }
     }
   }
