@@ -15,8 +15,7 @@ export function Dropzone({ extract }) {
         className="dropzone"
         ondrop={async function (ev) {
           ev.preventDefault();
-          this.classList.remove("dropzone-active");
-          this.parentElement.replaceChild(<Spinner />, this);
+          app.replaceChildren(<Spinner />);
 
           /** @type {BaseDirectory} */
           let root;
@@ -59,7 +58,8 @@ export function Dropzone({ extract }) {
         onclick={() => $("dropzone-file-input").click()}
         ondragover={ev => ev.preventDefault()}
       >
-        Drop files here!
+        <h3 className="drag-drop">Drag and drop files here!</h3>
+        <div className="select-files">Or click to select files</div>
       </div>
     </div>
   );

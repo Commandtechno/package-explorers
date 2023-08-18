@@ -8,6 +8,7 @@ import { extractProfile } from "./tiles/Profile";
 
 export const name = "TikTok"
 export const accentColor = '#FF004F'
+export const instructions = 'https://support.tiktok.com/en/account-and-privacy/personalized-ads-and-data/requesting-your-data'
 
 export { default as banner } from './banner.svg'
 

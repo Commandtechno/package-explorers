@@ -3,6 +3,7 @@ import { Row } from "@common/components/Row";
 
 export const name = "Spotify";
 export const accentColor = "#1DB954";
+export const instructions = 'https://support.spotify.com/us/artists/article/exporting-data/'
 
 export { default as banner } from './banner.svg'
 

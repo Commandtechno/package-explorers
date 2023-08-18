@@ -1,5 +1,3 @@
-# 🚧 currently being rewritten 🚧
-
 # package-explorers
 
 A collection of explorers for different services data packages in a more understandable and readable format and showing you more information
@@ -12,5 +10,5 @@ My motivation for making this is my interest in data and privacy and being curio
 
 - [x] Discord
 - [x] TikTok
-- [ ] Spotify
+- [x] Spotify
 - [ ] Google

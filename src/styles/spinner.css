@@ -1,5 +1,11 @@
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 .spinner {
-  margin: 100px auto;
   width: 57px;
   height: 57px;
   position: relative;
