@@ -4,6 +4,7 @@ const { resolve } = require('path');
 
 const esbuild = require("esbuild");
 const esbuildMacros = require("esbuild-plugin-macros");
+const esbuildHtmlMinify = require('esbuild-plugin-html-minify')
 
 const dev = process.argv[2] === "dev";
 
@@ -22,7 +23,7 @@ esbuild.build({
       else console.log("watch build succeeded");
     }
   },
-  plugins: [esbuildMacros, {
+  plugins: [esbuildMacros, esbuildHtmlMinify(), {
     name: 'svg',
     setup(build) {
       build.onResolve({ filter: /\.svg$/ }, args => ({ path: resolve(args.resolveDir, args.path), namespace: 'svg' }));

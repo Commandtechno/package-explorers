@@ -13,7 +13,8 @@
   "dependencies": {
     "chart.js": "^3.9.1",
     "dayjs": "^1.11.5",
-    "esbuild-plugin-macros": "https://github.com/Commandtechno/esbuild-plugin-macros",
+    "esbuild-plugin-html-minify": "^1.0.0",
+    "esbuild-plugin-macros": "^1.0.0",
     "fflate": "^0.7.3",
     "gocsv": "^0.1.1",
     "svgo": "^2.8.0",
