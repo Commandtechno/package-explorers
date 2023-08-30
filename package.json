@@ -11,16 +11,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chart.js": "^3.9.1",
-    "dayjs": "^1.11.5",
+    "chart.js": "^4.4.0",
+    "dayjs": "^1.11.9",
+    "esbuild": "^0.19.2",
     "esbuild-plugin-html-minify": "^1.0.0",
     "esbuild-plugin-macros": "^1.0.0",
-    "fflate": "^0.7.3",
+    "fflate": "^0.8.0",
     "gocsv": "^0.1.1",
-    "svgo": "^2.8.0",
+    "svgo": "^3.0.2",
     "twemoji-parser": "^14.0.0"
-  },
-  "devDependencies": {
-    "esbuild": "^0.15.5"
   }
 }

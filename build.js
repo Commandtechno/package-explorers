@@ -17,12 +17,14 @@ esbuild.build({
   format: "esm",
   bundle: true,
   minify: !dev,
-  watch: dev && {
-    onRebuild(error, result) {
-      if (error) console.error("watch build failed:", error);
-      else console.log("watch build succeeded");
+  ...(dev && ({
+    watch: {
+      onRebuild(error, result) {
+        if (error) console.error("watch build failed:", error);
+        else console.log("watch build succeeded");
+      }
     }
-  },
+  })),
   plugins: [esbuildMacros, esbuildHtmlMinify(), {
     name: 'svg',
     setup(build) {
