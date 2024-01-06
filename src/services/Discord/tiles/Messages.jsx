@@ -21,6 +21,7 @@ import dayjs from "dayjs";
 /** @param {{ root: BaseDirectory, totalReactions: number, totalMessagesEdited: number, totalMessagesDeleted: number }} */
 export async function extractMessages({
   root,
+  channelNames,
   totalReactions,
   totalMessagesEdited,
   totalMessagesDeleted
@@ -42,10 +43,6 @@ export async function extractMessages({
   let channelMessageCounter = new Counter();
   let guildMessageCounter = new Counter();
 
-  const channelNames = await root
-    .getFile("messages/index.json")
-    .then(res => res.json())
-    .then(res => new Map(Object.entries(res)));
   const guildNames = new Map();
 
   for await (const channelDir of await root.getDir("messages")) {
@@ -116,10 +113,9 @@ export async function extractMessages({
     Messages: () =>
       <Tile>
         <h1>Messages</h1>
-        <div>You've sent <b>{formatNum(totalMessages)}</b> total messages in your <b>{formatNum(totalDays)}</b> days here.</div>
+        <div>You've sent <b>{formatNum(totalMessages)}</b> total messages in your <b>{formatNum(totalDays)}</b> days on Discord.</div>
         <div>That's an average of <b>{formatNum(averageDailyMessages)}</b> messages a day.</div>
-        <div>That's a total of <b>{formatNum(totalWords)}</b> words.</div>
-        <div>That's a total of <b>{formatNum(totalCharacters)}</b> characters.</div>
+        <div>That's a total of <b>{formatNum(totalWords)}</b> words and <b>{formatNum(totalCharacters)}</b> characters.</div>
         <div>Text wasn't enough? You sent <b>{formatNum(totalAttachments)}</b> files.</div>
         <div>Like emojis? You used <b>{formatNum(totalCustomEmojis)}</b> custom emojis and <b>{formatNum(totalDefaultEmojis)}</b> default emojis.</div>
         <div>Overall, you pinged <b>{formatNum(totalMentions)}</b> users, roles, and channels</div>

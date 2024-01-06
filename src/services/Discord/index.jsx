@@ -13,9 +13,14 @@ export { default as banner } from './banner.svg'
 
 /** @param {{ root: BaseDirectory }} */
 export async function extract({ root }) {
+  const channelNames = await root
+    .getFile("messages/index.json")
+    .then(res => res.json())
+    .then(res => new Map(Object.entries(res).map(([id, name]) => ([id, name?.endsWith('#0') ? name.slice(0, -2) : name]))));
+
   const { Account, Flags, Connections, TopGames } = await extractAccount({ root });
-  const { totalReactions, totalMessagesEdited, totalMessagesDeleted, Analytics } =
-    await extractActivity({ root });
+  const { totalReactions, totalMessagesEdited, totalMessagesDeleted, Analytics, TopCalls } =
+    await extractActivity({ root, channelNames });
   const {
     Messages,
     TopWords,
@@ -27,6 +32,7 @@ export async function extract({ root }) {
     MessagesPerHour
   } = await extractMessages({
     root,
+    channelNames,
     totalReactions,
     totalMessagesEdited,
     totalMessagesDeleted
@@ -49,6 +55,7 @@ export async function extract({ root }) {
     </Row>
     <Row>
       <TopDms />
+      <TopCalls />
       <TopChannels />
       <TopGuilds />
     </Row>

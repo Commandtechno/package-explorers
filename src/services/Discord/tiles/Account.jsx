@@ -11,7 +11,7 @@ import { getSnowflakeTimestamp, extractUserFlags } from "../helpers";
 import { accentColor } from "..";
 
 function formatDiscriminator(discriminator) {
-  return "#" + discriminator.toString().padStart(4, "0");
+  return discriminator ? "#" + discriminator.toString().padStart(4, "0") : '';
 }
 
 /** @param {{ root: BaseDirectory }} */
@@ -60,7 +60,7 @@ export async function extractAccount({ root }) {
       <Tile size={2}>
         <h1>Flags</h1>
         <FieldGroup>
-          {extractUserFlags(user.flags).map(({ flag, description }) => <Field label={flag} value={description} />)}
+          {extractUserFlags(user.flags).map(({ flag, description }) => <Field label={flag.replaceAll('_', ' ')} value={description} />)}
         </FieldGroup>
       </Tile>,
     Connections: () =>
