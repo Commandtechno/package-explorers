@@ -1,14 +1,13 @@
-const { readFile } = require('fs/promises')
-const { optimize } = require('svgo')
-const { resolve } = require('path');
+import { readFile } from 'fs/promises'
+import { optimize } from 'svgo'
+import { resolve } from 'path';
 
-const esbuild = require("esbuild");
-const esbuildMacros = require("esbuild-plugin-macros");
-const esbuildHtmlMinify = require('esbuild-plugin-html-minify')
+import esbuild from 'esbuild';
+import esbuildMacros from 'esbuild-plugin-macros';
+import esbuildHtmlMinify from 'esbuild-plugin-html-minify';
 
 const dev = process.argv[2] === "dev";
-
-esbuild.build({
+const ctx = await esbuild.context({
   entryPoints: ["./src/index.html", './src/index.jsx', './src/styles.css'],
   outdir: "./build",
   jsxFactory: "__jsx",
@@ -16,15 +15,8 @@ esbuild.build({
   loader: { ".svg": "file", '.html': 'copy' },
   format: "esm",
   bundle: true,
+  sourcemap: true,
   minify: !dev,
-  ...(dev && ({
-    watch: {
-      onRebuild(error, result) {
-        if (error) console.error("watch build failed:", error);
-        else console.log("watch build succeeded");
-      }
-    }
-  })),
   plugins: [esbuildMacros, esbuildHtmlMinify(), {
     name: 'svg',
     setup(build) {
@@ -39,3 +31,10 @@ esbuild.build({
     }
   }]
 });
+
+if (dev) {
+  await ctx.watch();
+  await ctx.serve()
+} else {
+  process.exit()
+}

@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "package-explorers",
   "version": "1.0.0",
   "description": "",
@@ -12,11 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "chart.js": "^4.4.0",
-    "dayjs": "^1.11.9",
-    "esbuild": "^0.19.2",
+    "dayjs": "^1.11.10",
+    "esbuild": "^0.19.3",
     "esbuild-plugin-html-minify": "^1.0.0",
     "esbuild-plugin-macros": "^1.0.0",
-    "fflate": "^0.8.0",
+    "fflate": "^0.8.1",
     "gocsv": "^0.1.1",
     "svgo": "^3.0.2",
     "twemoji-parser": "^14.0.0"

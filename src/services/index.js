@@ -1,5 +1,5 @@
 import * as Discord from "./Discord";
+import * as Spotify from './Spotify';
 import * as TikTok from "./TikTok";
-import * as Spotify from './Spotify'
 
-export default [Discord, TikTok, Spotify];
+export default [Discord, Spotify, TikTok];
