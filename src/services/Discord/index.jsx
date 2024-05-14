@@ -19,7 +19,7 @@ export async function extract({ root }) {
     .then(res => new Map(Object.entries(res).map(([id, name]) => ([id, name?.endsWith('#0') ? name.slice(0, -2) : name]))));
 
   const { Account, Flags, Connections, TopGames } = await extractAccount({ root });
-  const { totalReactions, totalMessagesEdited, totalMessagesDeleted, Analytics, TopCalls } =
+  const { totalReactions, totalMessagesEdited, totalMessagesDeleted, Analytics, TopCalls, PredictedGender, PredictedAge } =
     await extractActivity({ root, channelNames });
   const {
     Messages,
@@ -62,6 +62,10 @@ export async function extract({ root }) {
     <Row>
       <MessagesPerMonth />
       <MessagesPerHour />
+    </Row>
+    <Row>
+      <PredictedGender />
+      <PredictedAge />
     </Row>
   </>;
 }

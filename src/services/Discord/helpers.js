@@ -1,12 +1,13 @@
-import TWEMOJI_REGEX from "twemoji-parser/dist/lib/regex";
 import { USER_FLAGS } from "./constants/USER_FLAGS.macro";
+import { parse } from "@twemoji/parser";
+import regexPkg from "@twemoji/parser/dist/lib/regex.js";
 import dayjs from "dayjs";
-import { parse } from "twemoji-parser";
 
 const DISCORD_EPOCH = 1420070400000n;
 const MENTION_REGEX = /\<(@|@!|#|@&)\d+\>/g;
 const GLOBAL_CUSTOM_EMOJI_REGEX = /<a?:\w+:\d+>/g;
 const CUSTOM_EMOJI_REGEX = /<a?:(?<name>\w+):(?<id>\d+)>/;
+const TWEMOJI_REGEX = regexPkg.default ?? regexPkg;
 
 export const hasFlag = (flags, bit) => (BigInt(flags) & bit) === bit;
 export const extractUserFlags = flags => USER_FLAGS.filter(flag => hasFlag(flags, flag.value));

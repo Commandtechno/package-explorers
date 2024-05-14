@@ -8,6 +8,8 @@ import { getSnowflakeTimestamp } from "../helpers";
 import { readline } from "@common/util/readline";
 import { Counter } from "@common/util/counter";
 import { ChannelTypes } from "../enums/ChannelTypes";
+import { Chart } from '@common/components/Chart';
+import { accentColor } from '../../Discord';
 
 /** @param {{ root: BaseDirectory }} */
 export async function extractActivity({ root, channelNames }) {
@@ -34,6 +36,10 @@ export async function extractActivity({ root, channelNames }) {
 
   let totalCallDuration = 0;
   let callTimeCounter = new Counter();
+
+  let probabilityGender = [];
+  let probabilityAge = [];
+
 
   if (__ENV === "dev")
     events = {
@@ -63,7 +69,7 @@ export async function extractActivity({ root, channelNames }) {
       // session_start: 14858,
       // slash_command_used: 141
     };
-  else {
+  else
     for await (const eventsFile of analyticsDir) {
       if (!eventsFile.name.startsWith('events-')) continue
       const eventsStream = await eventsFile.stream();
@@ -74,15 +80,12 @@ export async function extractActivity({ root, channelNames }) {
             if (!event.duration) break
             let channelType = parseInt(event.channel_type);
             if (channelType !== ChannelTypes.DM && channelType !== ChannelTypes.GROUP_DM) break
-            if (typeof event.duration !== 'string') console.log(event)
-            let duration = typeof event.duration === 'string' ? parseInt(event.duration) : event.duration;
-            callTimeCounter.incr(event.channel_id, duration);
-            totalCallDuration += duration;
+            callTimeCounter.incr(event.channel_id, event.duration);
+            totalCallDuration += event.duration;
             break;
           case "activity_updated":
           case "channel_opened":
           case "guild_viewed":
-          // case "join_call":
           case "join_thread":
           case "keyboard_shortcut_used":
           case "launch_game":
@@ -94,47 +97,137 @@ export async function extractActivity({ root, channelNames }) {
           case "slash_command_used":
             events[event.event_type]++;
             break;
+          default:
+            if (event.predicted_gender)
+              probabilityGender.push({
+                timestamp: dayjs(event.day_pt),
+                male: event.prob_male,
+                female: event.prob_female,
+                other: event.prob_non_binary_gender_expansive
+              })
+
+            if (event.predicted_age)
+              probabilityAge.push({
+                timestamp: dayjs(event.day_pt),
+                '13-17': event.prob_13_17,
+                '18-24': event.prob_18_24,
+                '25-34': event.prob_25_34,
+                '35+': event.prob_35_over
+              })
         }
       }
     }
 
+  const totalDays = dayjs().diff(createdAt, "days");
+  const averageDailyGuilds = Math.round(events.guild_viewed / totalDays);
+  const averageDailyChannels = Math.round(events.channel_opened / totalDays);
 
-    const totalDays = dayjs().diff(createdAt, "days");
-    const averageDailyGuilds = Math.round(events.guild_viewed / totalDays);
-    const averageDailyChannels = Math.round(events.channel_opened / totalDays);
+  const topCalls = callTimeCounter.sort().slice(0, 100);
 
-    const topCalls = callTimeCounter.sort().slice(0, 100);
-    console.log(topCalls)
+  probabilityAge.sort((a, b) => a.timestamp.diff(b.timestamp));
+  probabilityGender.sort((a, b) => a.timestamp.diff(b.timestamp));
 
-    return {
-      totalReactions: events.add_reaction,
-      totalMessagesEdited: events.message_edited,
-      totalMessagesDeleted: events.message_deleted,
-      Analytics: () =>
-        <Tile>
-          <h1>Analytics</h1>
-          <div>Your status was updated <b>{formatNum(events.activity_updated)}</b> times.</div>
-          <div>Overall, you viewed <b>{formatNum(events.guild_viewed)}</b> servers and opened <b>{formatNum(events.channel_opened)}</b> channels.</div>
-          <div>That's an average of <b>{formatNum(averageDailyGuilds)}</b> guilds and <b>{formatNum(averageDailyChannels)}</b> channels a day.</div>
-          <div>Ring ring, you've spent <b>{dayjs.duration(totalCallDuration).humanize()}</b> in calls and voice channels.</div>
-          <div>Fast typer? You used <b>{formatNum(events.keyboard_shortcut_used)}</b> keyboard shortcuts.</div>
-          <div>Discord detected <b>{formatNum(events.launch_game)}</b> game launches.</div>
-          <div>You opened the quick switcher <b>{formatNum(events.quickswitcher_opened)}</b> times.</div>
-        </Tile>,
-      TopCalls: () =>
-        <Tile>
-          <h1>Top Calls</h1>
-          <table>
-            <tbody>
-              {topCalls.map(([channelId, duration], index) => (
-                <tr>
-                  <td>{index + 1}. {channelNames.get(channelId) ?? "Unknown"}</td>
-                  <td>{dayjs.duration(duration).humanize()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Tile>
-    };
-  }
+  return {
+    totalReactions: events.add_reaction,
+    totalMessagesEdited: events.message_edited,
+    totalMessagesDeleted: events.message_deleted,
+    Analytics: () =>
+      <Tile>
+        <h1>Analytics</h1>
+        <div>Your status was updated <b>{formatNum(events.activity_updated)}</b> times.</div>
+        <div>Overall, you viewed <b>{formatNum(events.guild_viewed)}</b> servers and opened <b>{formatNum(events.channel_opened)}</b> channels.</div>
+        <div>That's an average of <b>{formatNum(averageDailyGuilds)}</b> guilds and <b>{formatNum(averageDailyChannels)}</b> channels a day.</div>
+        <div>Ring ring, you've spent <b>{dayjs.duration(totalCallDuration).humanize()}</b> in calls and voice channels.</div>
+        <div>Fast typer? You used <b>{formatNum(events.keyboard_shortcut_used)}</b> keyboard shortcuts.</div>
+        <div>Discord detected <b>{formatNum(events.launch_game)}</b> game launches.</div>
+        <div>You opened the quick switcher <b>{formatNum(events.quickswitcher_opened)}</b> times.</div>
+      </Tile>,
+    TopCalls: () =>
+      <Tile>
+        <h1>Top Calls</h1>
+        <table>
+          <tbody>
+            {topCalls.map(([channelId, duration], index) => (
+              <tr>
+                <td>{index + 1}. {channelNames.get(channelId) ?? "Unknown"}</td>
+                <td>{dayjs.duration(duration).humanize()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Tile>,
+    PredictedGender: () =>
+      <Tile>
+        <Chart
+          type="line"
+          title="Predicted Gender"
+          data={{
+            labels: probabilityGender.map(({ timestamp }) => timestamp.format("YYYY-MM-DD")),
+            datasets: [
+              {
+                label: 'Male',
+                data: probabilityGender.map(({ male }) => male),
+                borderColor: '#3498db',
+              },
+              {
+                label: 'Female',
+                data: probabilityGender.map(({ female }) => female),
+                borderColor: '#e97bce',
+              },
+              {
+                label: 'Other',
+                data: probabilityGender.map(({ other }) => other),
+                borderColor: '#1abc9c'
+              }
+            ]
+          }}
+          options={{
+            scales: {
+              y: {
+                max: 1,
+              }
+            }
+          }}
+        />
+      </Tile>,
+    PredictedAge: () =>
+      <Tile>
+        <Chart
+          type="line"
+          title="Predicted Age"
+          data={{
+            labels: probabilityAge.map(({ timestamp }) => timestamp.format("YYYY-MM-DD")),
+            datasets: [
+              {
+                label: '13-17',
+                data: probabilityAge.map(point => point['13-17']),
+                borderColor: 'rgb(88, 101, 242)',
+              },
+              {
+                label: '18-24',
+                data: probabilityAge.map(point => point['18-24']),
+                borderColor: 'rgb(155, 132, 239)',
+              },
+              {
+                label: '25-34',
+                data: probabilityAge.map(point => point['25-34']),
+                borderColor: 'rgb(35, 165, 89)'
+              },
+              {
+                label: '35+',
+                data: probabilityAge.map(point => point['35+']),
+                borderColor: 'rgb(252, 194, 69)'
+              }
+            ]
+          }}
+          options={{
+            scales: {
+              y: {
+                max: 1,
+              }
+            }
+          }}
+        />
+      </Tile>
+  };
 }
