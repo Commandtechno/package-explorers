@@ -35,6 +35,8 @@ const ctx = await esbuild.context({
 if (dev) {
   await ctx.watch();
   await ctx.serve()
+  console.log('Listening on http://localhost:8000')
 } else {
+  await ctx.rebuild()
   process.exit()
 }

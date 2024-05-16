@@ -15,7 +15,7 @@
     "@twemoji/parser": "^15.1.1",
     "chart.js": "^4.4.2",
     "dayjs": "^1.11.11",
-    "esbuild": "^0.21.2",
+    "esbuild": "^0.21.3",
     "esbuild-plugin-html-minify": "^1.0.0",
     "esbuild-plugin-macros": "^1.0.0",
     "fflate": "^0.8.2",
