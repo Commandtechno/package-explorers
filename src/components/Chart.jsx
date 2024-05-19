@@ -11,7 +11,7 @@ export function Chart(props) {
     maintainAspectRatio: false,
     plugins: {
       ...props?.options?.plugins,
-      legend: { ...props?.options?.plugins?.legend, display: false },
+      legend: { display: false, ...props?.options?.plugins?.legend },
       title: {
         ...props?.options?.plugins?.title,
         display: true,
