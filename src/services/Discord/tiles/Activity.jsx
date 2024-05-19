@@ -80,7 +80,7 @@ export async function extractActivity({ root, channelNames }) {
             if (!event.duration) break
             let channelType = parseInt(event.channel_type);
             if (channelType !== ChannelTypes.DM && channelType !== ChannelTypes.GROUP_DM) break
-            callTimeCounter.incr(event.channel_id, event.duration);
+            callTimeCounter.incr(event.channel_id, parseInt(event.duration));
             totalCallDuration += event.duration;
             break;
           case "activity_updated":
