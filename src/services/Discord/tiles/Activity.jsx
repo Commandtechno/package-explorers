@@ -186,7 +186,12 @@ export async function extractActivity({ root, channelNames }) {
               y: {
                 max: 1,
               }
-            }
+            },
+            plugins: {
+              legend: {
+                display: true,
+              }
+            },
           }}
         />
       </Tile>,
@@ -225,7 +230,12 @@ export async function extractActivity({ root, channelNames }) {
               y: {
                 max: 1,
               }
-            }
+            },
+            plugins: {
+              legend: {
+                display: true,
+              }
+            },
           }}
         />
       </Tile>
