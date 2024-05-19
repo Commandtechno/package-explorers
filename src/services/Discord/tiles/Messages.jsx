@@ -54,7 +54,8 @@ export async function extractMessages({
       /** @type {AsyncGenerator<import("../util/types").Message>} */
       const messages = await channelDir
         .getFile("messages.csv")
-        .then(file => file.csv({ withHeaders: true }));
+        .then(file => file.csv({ withHeaders: true }))
+        .catch(() => channelDir.getFile("messages.json").then(file => file.json()));
 
       for await (const message of messages) {
         totalMessages++;
