@@ -136,7 +136,7 @@ export async function extractActivity({ root, channelNames }) {
         <h1>Analytics</h1>
         <div>Your status was updated <b>{formatNum(events.activity_updated)}</b> times.</div>
         <div>Overall, you clicked on a server <b>{formatNum(events.guild_viewed)}</b> times, and a channel <b>{formatNum(events.channel_opened)}</b> times.</div>
-        <div>That's an average of <b>{formatNum(averageDailyGuilds)}</b> guilds and <b>{formatNum(averageDailyChannels)}</b> channels a day.</div>
+        <div>That's an average of <b>{formatNum(averageDailyGuilds)}</b> servers and <b>{formatNum(averageDailyChannels)}</b> channels a day.</div>
         <div>Ring ring, you've spent <b>{dayjs.duration(totalCallDuration).humanize()}</b> in calls and voice channels.</div>
         <div>Fast typer? You used <b>{formatNum(events.keyboard_shortcut_used)}</b> keyboard shortcuts.</div>
         <div>Discord detected <b>{formatNum(events.launch_game)}</b> game launches.</div>

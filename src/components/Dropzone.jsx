@@ -9,7 +9,39 @@ const app = $("app");
 export function Dropzone({ extract }) {
   return (
     <div className="dropzone-container">
-      <input type="file" id="dropzone-file-input" className="dropzone-file-input" />
+      <input type="file" id="dropzone-file-input" className="dropzone-file-input" onchange={async function (ev) {
+        app.replaceChildren(<Spinner />);
+
+        /** @type {BaseDirectory} */
+        let root;
+
+        const entry = ev.target.files[0];
+        if (entry.name.endsWith(".zip")) {
+          const uz = new Unzip();
+          const dir = new ZipDirectory(entry.name.replace(".zip", ""));
+          uz.register(AsyncUnzipInflate);
+          uz.onfile = file => dir.createFile(file);
+
+          const stream = await entry.stream();
+          const reader = await stream.getReader();
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            uz.push(value);
+          }
+
+          root = dir;
+        } else {
+          throw new Error("Invalid file type");
+        }
+
+        await extract({ root })
+          .then(res => app.replaceChildren(<div className="result">{res}</div>))
+          .catch(err => {
+            console.error(err);
+            document.body.innerText = err.message;
+          });
+      }} />
       <div
         id="dropzone"
         className="dropzone"
