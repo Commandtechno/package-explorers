@@ -38,6 +38,7 @@ export function formatNum(num) {
 
 export function formatCurrency(amount, currency) {
   amount ||= 0;
+  currency ||= "USD";
   return amount.toLocaleString(undefined, { style: "currency", currency });
 }
 
