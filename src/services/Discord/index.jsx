@@ -14,7 +14,8 @@ export { default as banner } from './banner.svg'
 /** @param {{ root: BaseDirectory }} */
 export async function extract({ root }) {
   const channelNames = await root
-    .getFile("messages/index.json")
+    .getFile("Messages/index.json")
+    .catch(() => root.getFile('messages/index.json'))
     .then(res => res.json())
     .then(res => new Map(Object.entries(res).map(([id, name]) => ([id, name?.endsWith('#0') ? name.slice(0, -2) : name]))));
 

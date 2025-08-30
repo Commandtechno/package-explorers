@@ -4,6 +4,7 @@ import {
   getCustomEmojis,
   getDefaultEmojis,
   getEmojiUrl,
+  getGDMIcon,
   getMentionCount,
   getMessageUrl
 } from "../helpers";
@@ -45,7 +46,7 @@ export async function extractMessages({
 
   const guildNames = new Map();
 
-  for await (const channelDir of await root.getDir("messages")) {
+  for await (const channelDir of await root.getDir("Messages").catch(() => root.getDir('messages'))) {
     if (channelDir.isDirectory) {
       const channel = await channelDir.getFile("channel.json").then(file => file.json());
       if (!channelNames.has(channel.id)) channelNames.set(channel.id, channel.name);
@@ -78,7 +79,7 @@ export async function extractMessages({
           emojiCounter.incr(defaultEmoji);
         }
 
-        if (channel.type === ChannelTypes.DM || channel.type === ChannelTypes.GROUP_DM) dmMessageCounter.incr(channel.id);
+        if (channel.type === 'DM' || channel.type === 'GROUP_DM') dmMessageCounter.incr(channel.id);
         else channelMessageCounter.incr(channel.id);
         if (channel.guild) guildMessageCounter.incr(channel.guild.id);
 
@@ -136,7 +137,8 @@ export async function extractMessages({
           <tbody>
             {topWords.map(([word, count], index) => (
               <tr>
-                <td>{index + 1}. {word}</td>
+                <td className="index">{index + 1}</td>
+                <td>{word}</td>
                 <td>{formatNum(count)}</td>
               </tr>
             ))}
@@ -150,7 +152,8 @@ export async function extractMessages({
           <tbody>
             {topEmojis.map(([emoji, count], index) => (
               <tr>
-                <td>{index + 1}. <img className="discord-emoji" src={getEmojiUrl(emoji)} /></td>
+                <td className="index">{index + 1}</td>
+                <td><img className="discord-emoji" src={getEmojiUrl(emoji)} /></td>
                 <td>{formatNum(count)}</td>
               </tr>
             ))}
@@ -164,7 +167,8 @@ export async function extractMessages({
           <tbody>
             {topDms.map(([dmId, count], index) => (
               <tr>
-                <td>{index + 1}. {channelNames.get(dmId) ?? 'Unknown'}</td>
+                <td className="index">{index + 1}</td>
+                <td>{channelNames.get(dmId) ?? 'Unknown'}</td>
                 <td>{formatNum(count)}</td>
               </tr>
             ))}
@@ -178,7 +182,8 @@ export async function extractMessages({
           <tbody>
             {topChannels.map(([channelId, count], index) => (
               <tr>
-                <td>{index + 1}. {channelNames.get(channelId) ?? 'Unknown'}</td>
+                <td className="index">{index + 1}</td>
+                <td>{channelNames.get(channelId) ?? 'Unknown'}</td>
                 <td>{formatNum(count)}</td>
               </tr>
             ))}
@@ -192,7 +197,8 @@ export async function extractMessages({
           <tbody>
             {topGuilds.map(([guildId, count], index) => (
               <tr>
-                <td>{index + 1}. {guildNames.get(guildId)}</td>
+                <td className="index">{index + 1}</td>
+                <td>{guildNames.get(guildId)}</td>
                 <td>{formatNum(count)}</td>
               </tr>
             ))}

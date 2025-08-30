@@ -9,13 +9,16 @@ import { readline } from "@common/util/readline";
 import { Counter } from "@common/util/counter";
 import { ChannelTypes } from "../enums/ChannelTypes";
 import { Chart } from '@common/components/Chart';
-import { accentColor } from '../../Discord';
 
 /** @param {{ root: BaseDirectory }} */
 export async function extractActivity({ root, channelNames }) {
-  const analyticsDir = await root.getDir("activity/analytics");
+  const analyticsDir = await root
+    .getDir("Activity/analytics")
+    .catch(() => root.getDir('activity/analytics'));
+
   const createdAt = await root
-    .getFile("account/user.json")
+    .getFile("Account/user.json")
+    .catch(() => root.getFile('account/user.json'))
     .then(file => file.json())
     .then(user => getSnowflakeTimestamp(user.id));
 
@@ -149,7 +152,8 @@ export async function extractActivity({ root, channelNames }) {
           <tbody>
             {topCalls.map(([channelId, duration], index) => (
               <tr>
-                <td>{index + 1}. {channelNames.get(channelId) ?? "Unknown"}</td>
+                <td className="index">{index + 1}</td>
+                <td>{channelNames.get(channelId) ?? "Unknown"}</td>
                 <td>{dayjs.duration(duration).humanize()}</td>
               </tr>
             ))}

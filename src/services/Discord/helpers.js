@@ -1,4 +1,3 @@
-import { USER_FLAGS } from "./constants/USER_FLAGS.macro";
 import { parse } from "@twemoji/parser";
 import regexPkg from "@twemoji/parser/dist/lib/regex.js";
 import dayjs from "dayjs";
@@ -8,9 +7,6 @@ const MENTION_REGEX = /\<(@|@!|#|@&)\d+\>/g;
 const GLOBAL_CUSTOM_EMOJI_REGEX = /<a?:\w+:\d+>/g;
 const CUSTOM_EMOJI_REGEX = /<a?:(?<name>\w+):(?<id>\d+)>/;
 const TWEMOJI_REGEX = regexPkg.default ?? regexPkg;
-
-export const hasFlag = (flags, bit) => (BigInt(flags) & bit) === bit;
-export const extractUserFlags = flags => USER_FLAGS.filter(flag => hasFlag(flags, flag.value));
 
 export const getAttachmentCount = attachments => (attachments ? attachments.split(" ").length : 0);
 export const getMentionCount = text => text.match(MENTION_REGEX)?.length ?? 0;
@@ -31,4 +27,8 @@ export function getEmojiUrl(emoji) {
   if (customEmoji) return `https://cdn.discordapp.com/emojis/${customEmoji.groups.id}`;
   const defaultEmoji = parse(emoji)[0];
   if (defaultEmoji) return defaultEmoji.url;
+}
+
+export function getGDMIcon(id, icon) {
+  return `https://cdn.discordapp.com/channel-icons/${id}/${icon}?size=16`
 }

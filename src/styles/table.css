@@ -11,9 +11,8 @@ tr > * {
   padding: 5px;
 }
 
-/* dont ask */
-
-td:first-child {
+/* doesnt work idk how to fix it */
+/* td:first-child {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
@@ -21,14 +20,15 @@ td:first-child {
 td:last-child {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-}
+} */
 
 tr:nth-child(odd) {
   background: var(--background-tertiary);
 }
 
-td:first-child {
-  text-align: left;
+td.index {
+  color: var(--foreground-secondary);
+  width: 10px;
 }
 
 td:last-child {

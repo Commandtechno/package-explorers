@@ -7,8 +7,9 @@ import { SHORT_DATE_TIME } from "@common/constants/DATE_FORMATS";
 import { BaseDirectory } from "@common/util/fs";
 import { formatNum, formatCurrency } from "@common/util/helpers";
 
-import { getSnowflakeTimestamp, extractUserFlags } from "../helpers";
+import { getSnowflakeTimestamp } from "../helpers";
 import { accentColor } from "..";
+import { USER_FLAGS } from "../constants/USER_FLAGS.macro";
 
 function formatDiscriminator(discriminator) {
   return discriminator ? "#" + discriminator.toString().padStart(4, "0") : '';
@@ -16,7 +17,10 @@ function formatDiscriminator(discriminator) {
 
 /** @param {{ root: BaseDirectory }} */
 export async function extractAccount({ root }) {
-  const accountDir = await root.getDir("account");
+  const accountDir = await root
+    .getDir("Account")
+    .catch(() => root.getDir('account'));
+
   /** @type {import("../util/types").Account} */
   const user = await accountDir.getFile("user.json").then(file => file.json());
   const avatar = await accountDir.findFile(name => /^avatar\..*$/.test(name));
@@ -25,7 +29,7 @@ export async function extractAccount({ root }) {
   const created = getSnowflakeTimestamp(user.id);
   const moneySpent = formatCurrency(
     user.payments.reduce((total, { amount, amount_refunded }) => total + amount - amount_refunded, 0) / 100,
-    user.payments[0]?.currency
+    user.payments.find(payment => payment.currency !== 'discord_orb')?.currency
   );
 
   const topGames = user.user_activity_application_statistics
@@ -60,7 +64,12 @@ export async function extractAccount({ root }) {
       <Tile size={2}>
         <h1>Flags</h1>
         <FieldGroup>
-          {extractUserFlags(user.flags).map(({ flag, description }) => <Field label={flag.replaceAll('_', ' ')} value={description} />)}
+          {user.flags.map((flag) =>
+            <Field
+              label={flag.replaceAll('_', ' ')}
+              value={USER_FLAGS.find(value => value.flag === flag)?.description ?? 'Unknown'}
+            />
+          )}
         </FieldGroup>
       </Tile>,
     Connections: () =>
