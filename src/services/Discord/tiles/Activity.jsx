@@ -12,10 +12,25 @@ import { Chart } from '@common/components/Chart';
 
 /** @param {{ root: BaseDirectory }} */
 export async function extractActivity({ root, channelNames }) {
-  const analyticsDir = await root
-    .getDir("Activity/analytics")
-    .catch(() => root.getDir('activity/analytics'));
+  const activityDir = await root
+    .getDir('Activity')
+    .catch(() => root.getDir('activity')).catch(() => null)
 
+  if (!activityDir) {
+    alert('Activity data not found as it may have been excluded during the export process. You may still continue though some information will be missing. If you believe this is an error contact me on Discord @commandtechno.')
+    const missingTile = () => <Tile><h1>⚠️ Activity data missing</h1></Tile>
+    return {
+      totalReactions: -1,
+      totalMessagesEdited: -1,
+      totalMessagesDeleted: -1,
+      Analytics: missingTile,
+      TopCalls: missingTile,
+      PredictedGender: missingTile,
+      PredictedAge: missingTile
+    }
+  }
+
+  const analyticsDir = await root.getDir("analytics")
   const createdAt = await root
     .getFile("Account/user.json")
     .catch(() => root.getFile('account/user.json'))
