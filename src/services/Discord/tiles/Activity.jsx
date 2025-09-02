@@ -30,7 +30,7 @@ export async function extractActivity({ root, channelNames }) {
     }
   }
 
-  const analyticsDir = await root.getDir("analytics")
+  const analyticsDir = await activityDir.getDir("analytics")
   const createdAt = await root
     .getFile("Account/user.json")
     .catch(() => root.getFile('account/user.json'))
